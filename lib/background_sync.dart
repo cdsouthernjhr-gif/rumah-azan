@@ -10,13 +10,14 @@ import 'data/models/app_settings.dart';
 import 'data/providers/providers.dart';
 import 'data/repositories/settings_repository.dart';
 
-/// Opens the app database. `shareAcrossIsolates` lets the UI engine and the
-/// headless background engine (same process, different isolates) use one
-/// SQLite connection instead of competing for file locks.
-AppDatabase openAppDatabase() => AppDatabase(driftDatabase(
-      name: 'rumah_azan',
-      native: const DriftNativeOptions(shareAcrossIsolates: true),
-    ));
+/// Opens the app database.
+///
+/// NOTE: `shareAcrossIsolates` is deliberately NOT used: if opening SQLite
+/// fails, drift_flutter's shared mode retries forever, which froze the app on
+/// its splash screen. Concurrent access from the UI and the background engine
+/// is instead handled by SQLite itself (WAL + busy_timeout, see
+/// AppDatabase.migration.beforeOpen).
+AppDatabase openAppDatabase() => AppDatabase(driftDatabase(name: 'rumah_azan'));
 
 /// Result of one background run (exposed for tests).
 class BackgroundSyncResult {

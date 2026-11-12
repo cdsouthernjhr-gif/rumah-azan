@@ -209,6 +209,11 @@ class AppDatabase extends _$AppDatabase {
         },
         beforeOpen: (details) async {
           await customStatement('PRAGMA foreign_keys = ON');
+          // Wait (instead of failing) if the background sync holds a lock.
+          await customStatement('PRAGMA busy_timeout = 5000');
+          // WAL lets a reader and a writer work at the same time. Returns a
+          // row, so use customSelect; ignored for in-memory databases.
+          await customSelect('PRAGMA journal_mode = WAL').get();
         },
       );
 }
