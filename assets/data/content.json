@@ -1,0 +1,326 @@
+{
+  "version": 1,
+  "notice": "Semua teks perlu disemak oleh penyemak bertauliah sebelum keluaran. Teks Arab al-Quran mesti disahkan dengan mushaf rasmi (Rasm Uthmani) dan terjemahan dengan Tafsir Pimpinan Ar-Rahman (JAKIM). Lihat docs/CONTENT_VERIFICATION.md.",
+  "items": [
+    {
+      "id": "surah_1", "type": "quran", "categories": ["surah_pendek"],
+      "titleMs": "Surah Al-Fatihah", "titleEn": "Surah Al-Fatihah",
+      "reference": "Al-Quran, Surah Al-Fatihah (1): 1–7",
+      "verification": "perlu_semakan",
+      "ayat": [
+        {"n": 1, "ar": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ", "rumi": "Bismillāhir-raḥmānir-raḥīm", "ms": "Dengan nama Allah, Yang Maha Pemurah, lagi Maha Mengasihani."},
+        {"n": 2, "ar": "الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ", "rumi": "Al-ḥamdu lillāhi rabbil-‘ālamīn", "ms": "Segala puji bagi Allah, Tuhan yang memelihara dan mentadbir sekalian alam."},
+        {"n": 3, "ar": "الرَّحْمَٰنِ الرَّحِيمِ", "rumi": "Ar-raḥmānir-raḥīm", "ms": "Yang Maha Pemurah, lagi Maha Mengasihani."},
+        {"n": 4, "ar": "مَالِكِ يَوْمِ الدِّينِ", "rumi": "Māliki yaumid-dīn", "ms": "Yang Menguasai hari Pembalasan."},
+        {"n": 5, "ar": "إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ", "rumi": "Iyyāka na‘budu wa iyyāka nasta‘īn", "ms": "Hanya Engkaulah yang kami sembah, dan hanya kepada Engkaulah kami memohon pertolongan."},
+        {"n": 6, "ar": "اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ", "rumi": "Ihdinaṣ-ṣirāṭal-mustaqīm", "ms": "Tunjukilah kami jalan yang lurus."},
+        {"n": 7, "ar": "صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ وَلَا الضَّالِّينَ", "rumi": "Ṣirāṭal-lażīna an‘amta ‘alaihim ghairil-maghḍūbi ‘alaihim wa laḍ-ḍāllīn", "ms": "Iaitu jalan orang-orang yang Engkau telah kurniakan nikmat kepada mereka, bukan jalan orang-orang yang Engkau murkai dan bukan pula jalan orang-orang yang sesat."}
+      ]
+    },
+    {
+      "id": "surah_112", "type": "quran", "categories": ["surah_pendek", "zikir_pagi", "zikir_petang"],
+      "titleMs": "Surah Al-Ikhlas", "titleEn": "Surah Al-Ikhlas",
+      "reference": "Al-Quran, Surah Al-Ikhlas (112): 1–4. Dibaca 3 kali pagi dan petang: Sunan Abi Dawud no. 5082, Sunan at-Tirmizi no. 3575.",
+      "repeat": 3, "verification": "perlu_semakan",
+      "ayat": [
+        {"n": 1, "ar": "قُلْ هُوَ اللَّهُ أَحَدٌ", "rumi": "Qul huwallāhu aḥad", "ms": "Katakanlah (wahai Muhammad): Dialah Allah Yang Maha Esa."},
+        {"n": 2, "ar": "اللَّهُ الصَّمَدُ", "rumi": "Allāhuṣ-ṣamad", "ms": "Allah yang menjadi tumpuan sekalian makhluk untuk memohon segala hajat."},
+        {"n": 3, "ar": "لَمْ يَلِدْ وَلَمْ يُولَدْ", "rumi": "Lam yalid wa lam yūlad", "ms": "Dia tidak beranak dan tidak pula diperanakkan."},
+        {"n": 4, "ar": "وَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ", "rumi": "Wa lam yakul-lahū kufuwan aḥad", "ms": "Dan tidak ada sesiapa pun yang setara dengan-Nya."}
+      ]
+    },
+    {
+      "id": "surah_113", "type": "quran", "categories": ["surah_pendek", "zikir_pagi", "zikir_petang"],
+      "titleMs": "Surah Al-Falaq", "titleEn": "Surah Al-Falaq",
+      "reference": "Al-Quran, Surah Al-Falaq (113): 1–5. Dibaca 3 kali pagi dan petang: Sunan Abi Dawud no. 5082, Sunan at-Tirmizi no. 3575.",
+      "repeat": 3, "verification": "perlu_semakan",
+      "ayat": [
+        {"n": 1, "ar": "قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ", "rumi": "Qul a‘ūżu birabbil-falaq", "ms": "Katakanlah: Aku berlindung kepada Tuhan yang menguasai waktu subuh,"},
+        {"n": 2, "ar": "مِن شَرِّ مَا خَلَقَ", "rumi": "Min syarri mā khalaq", "ms": "daripada kejahatan makhluk yang Dia ciptakan,"},
+        {"n": 3, "ar": "وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ", "rumi": "Wa min syarri ghāsiqin iżā waqab", "ms": "dan daripada kejahatan malam apabila ia gelap gelita,"},
+        {"n": 4, "ar": "وَمِن شَرِّ النَّفَّاثَاتِ فِي الْعُقَدِ", "rumi": "Wa min syarrin-naffāṡāti fil-‘uqad", "ms": "dan daripada kejahatan makhluk yang menghembus pada simpulan-simpulan ikatan,"},
+        {"n": 5, "ar": "وَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ", "rumi": "Wa min syarri ḥāsidin iżā ḥasad", "ms": "dan daripada kejahatan orang yang dengki apabila dia berdengki."}
+      ]
+    },
+    {
+      "id": "surah_114", "type": "quran", "categories": ["surah_pendek", "zikir_pagi", "zikir_petang"],
+      "titleMs": "Surah An-Nas", "titleEn": "Surah An-Nas",
+      "reference": "Al-Quran, Surah An-Nas (114): 1–6. Dibaca 3 kali pagi dan petang: Sunan Abi Dawud no. 5082, Sunan at-Tirmizi no. 3575.",
+      "repeat": 3, "verification": "perlu_semakan",
+      "ayat": [
+        {"n": 1, "ar": "قُلْ أَعُوذُ بِرَبِّ النَّاسِ", "rumi": "Qul a‘ūżu birabbin-nās", "ms": "Katakanlah: Aku berlindung kepada Tuhan sekalian manusia,"},
+        {"n": 2, "ar": "مَلِكِ النَّاسِ", "rumi": "Malikin-nās", "ms": "Raja sekalian manusia,"},
+        {"n": 3, "ar": "إِلَٰهِ النَّاسِ", "rumi": "Ilāhin-nās", "ms": "Tuhan yang disembah oleh sekalian manusia,"},
+        {"n": 4, "ar": "مِن شَرِّ الْوَسْوَاسِ الْخَنَّاسِ", "rumi": "Min syarril-waswāsil-khannās", "ms": "daripada kejahatan pembisik yang timbul tenggelam,"},
+        {"n": 5, "ar": "الَّذِي يُوَسْوِسُ فِي صُدُورِ النَّاسِ", "rumi": "Allażī yuwaswisu fī ṣudūrin-nās", "ms": "yang membisikkan (kejahatan) ke dalam dada manusia,"},
+        {"n": 6, "ar": "مِنَ الْجِنَّةِ وَالنَّاسِ", "rumi": "Minal-jinnati wan-nās", "ms": "daripada kalangan jin dan manusia."}
+      ]
+    },
+    {
+      "id": "surah_103", "type": "quran", "categories": ["surah_pendek"],
+      "titleMs": "Surah Al-‘Asr", "titleEn": "Surah Al-Asr",
+      "reference": "Al-Quran, Surah Al-‘Asr (103): 1–3",
+      "verification": "perlu_semakan",
+      "ayat": [
+        {"n": 1, "ar": "وَالْعَصْرِ", "rumi": "Wal-‘aṣr", "ms": "Demi masa!"},
+        {"n": 2, "ar": "إِنَّ الْإِنسَانَ لَفِي خُسْرٍ", "rumi": "Innal-insāna lafī khusr", "ms": "Sesungguhnya manusia itu dalam kerugian,"},
+        {"n": 3, "ar": "إِلَّا الَّذِينَ آمَنُوا وَعَمِلُوا الصَّالِحَاتِ وَتَوَاصَوْا بِالْحَقِّ وَتَوَاصَوْا بِالصَّبْرِ", "rumi": "Illal-lażīna āmanū wa ‘amiluṣ-ṣāliḥāti wa tawāṣau bil-ḥaqqi wa tawāṣau biṣ-ṣabr", "ms": "kecuali orang-orang yang beriman dan beramal soleh, serta berpesan-pesan dengan kebenaran dan berpesan-pesan dengan kesabaran."}
+      ]
+    },
+    {
+      "id": "surah_108", "type": "quran", "categories": ["surah_pendek"],
+      "titleMs": "Surah Al-Kauthar", "titleEn": "Surah Al-Kawthar",
+      "reference": "Al-Quran, Surah Al-Kauthar (108): 1–3",
+      "verification": "perlu_semakan",
+      "ayat": [
+        {"n": 1, "ar": "إِنَّا أَعْطَيْنَاكَ الْكَوْثَرَ", "rumi": "Innā a‘ṭainākal-kauṡar", "ms": "Sesungguhnya Kami telah mengurniakan kepadamu (wahai Muhammad) kebaikan yang banyak (al-Kauthar)."},
+        {"n": 2, "ar": "فَصَلِّ لِرَبِّكَ وَانْحَرْ", "rumi": "Faṣalli lirabbika wanḥar", "ms": "Maka dirikanlah solat kerana Tuhanmu dan sembelihlah korban."},
+        {"n": 3, "ar": "إِنَّ شَانِئَكَ هُوَ الْأَبْتَرُ", "rumi": "Inna syāni’aka huwal-abtar", "ms": "Sesungguhnya orang yang membencimu, dialah yang terputus (daripada kebaikan)."}
+      ]
+    },
+    {
+      "id": "surah_109", "type": "quran", "categories": ["surah_pendek"],
+      "titleMs": "Surah Al-Kafirun", "titleEn": "Surah Al-Kafirun",
+      "reference": "Al-Quran, Surah Al-Kafirun (109): 1–6",
+      "verification": "perlu_semakan",
+      "ayat": [
+        {"n": 1, "ar": "قُلْ يَا أَيُّهَا الْكَافِرُونَ", "rumi": "Qul yā ayyuhal-kāfirūn", "ms": "Katakanlah (wahai Muhammad): Wahai orang-orang kafir!"},
+        {"n": 2, "ar": "لَا أَعْبُدُ مَا تَعْبُدُونَ", "rumi": "Lā a‘budu mā ta‘budūn", "ms": "Aku tidak menyembah apa yang kamu sembah."},
+        {"n": 3, "ar": "وَلَا أَنتُمْ عَابِدُونَ مَا أَعْبُدُ", "rumi": "Wa lā antum ‘ābidūna mā a‘bud", "ms": "Dan kamu tidak menyembah apa yang aku sembah."},
+        {"n": 4, "ar": "وَلَا أَنَا عَابِدٌ مَّا عَبَدتُّمْ", "rumi": "Wa lā ana ‘ābidum mā ‘abattum", "ms": "Dan aku tidak akan menyembah apa yang kamu sembah."},
+        {"n": 5, "ar": "وَلَا أَنتُمْ عَابِدُونَ مَا أَعْبُدُ", "rumi": "Wa lā antum ‘ābidūna mā a‘bud", "ms": "Dan kamu tidak akan menyembah apa yang aku sembah."},
+        {"n": 6, "ar": "لَكُمْ دِينُكُمْ وَلِيَ دِينِ", "rumi": "Lakum dīnukum wa liya dīn", "ms": "Bagi kamu agama kamu, dan bagiku agamaku."}
+      ]
+    },
+    {
+      "id": "surah_110", "type": "quran", "categories": ["surah_pendek"],
+      "titleMs": "Surah An-Nasr", "titleEn": "Surah An-Nasr",
+      "reference": "Al-Quran, Surah An-Nasr (110): 1–3",
+      "verification": "perlu_semakan",
+      "ayat": [
+        {"n": 1, "ar": "إِذَا جَاءَ نَصْرُ اللَّهِ وَالْفَتْحُ", "rumi": "Iżā jā’a naṣrullāhi wal-fatḥ", "ms": "Apabila datang pertolongan Allah dan kemenangan,"},
+        {"n": 2, "ar": "وَرَأَيْتَ النَّاسَ يَدْخُلُونَ فِي دِينِ اللَّهِ أَفْوَاجًا", "rumi": "Wa ra’aitan-nāsa yadkhulūna fī dīnillāhi afwājā", "ms": "dan engkau melihat manusia memeluk agama Allah beramai-ramai,"},
+        {"n": 3, "ar": "فَسَبِّحْ بِحَمْدِ رَبِّكَ وَاسْتَغْفِرْهُ إِنَّهُ كَانَ تَوَّابًا", "rumi": "Fasabbiḥ biḥamdi rabbika wastaghfirh, innahū kāna tawwābā", "ms": "maka bertasbihlah dengan memuji Tuhanmu dan mohonlah ampun kepada-Nya. Sesungguhnya Dia Maha Penerima taubat."}
+      ]
+    },
+    {
+      "id": "surah_107", "type": "quran", "categories": ["surah_pendek"],
+      "titleMs": "Surah Al-Ma‘un", "titleEn": "Surah Al-Ma'un",
+      "reference": "Al-Quran, Surah Al-Ma‘un (107): 1–7",
+      "verification": "perlu_semakan",
+      "ayat": [
+        {"n": 1, "ar": "أَرَأَيْتَ الَّذِي يُكَذِّبُ بِالدِّينِ", "rumi": "Ara’aital-lażī yukażżibu bid-dīn", "ms": "Tahukah engkau orang yang mendustakan agama (hari pembalasan)?"},
+        {"n": 2, "ar": "فَذَٰلِكَ الَّذِي يَدُعُّ الْيَتِيمَ", "rumi": "Fażālikal-lażī yadu‘‘ul-yatīm", "ms": "Itulah orang yang menindas anak yatim,"},
+        {"n": 3, "ar": "وَلَا يَحُضُّ عَلَىٰ طَعَامِ الْمِسْكِينِ", "rumi": "Wa lā yaḥuḍḍu ‘alā ṭa‘āmil-miskīn", "ms": "dan tidak menggalakkan memberi makan orang miskin."},
+        {"n": 4, "ar": "فَوَيْلٌ لِّلْمُصَلِّينَ", "rumi": "Fawailul-lil-muṣallīn", "ms": "Maka celakalah orang-orang yang solat,"},
+        {"n": 5, "ar": "الَّذِينَ هُمْ عَن صَلَاتِهِمْ سَاهُونَ", "rumi": "Allażīna hum ‘an ṣalātihim sāhūn", "ms": "iaitu mereka yang lalai daripada solatnya,"},
+        {"n": 6, "ar": "الَّذِينَ هُمْ يُرَاءُونَ", "rumi": "Allażīna hum yurā’ūn", "ms": "yang berbuat riyak (menunjuk-nunjuk),"},
+        {"n": 7, "ar": "وَيَمْنَعُونَ الْمَاعُونَ", "rumi": "Wa yamna‘ūnal-mā‘ūn", "ms": "dan enggan memberikan bantuan (barang keperluan)."}
+      ]
+    },
+    {
+      "id": "ayat_kursi", "type": "quran", "categories": ["ayat_pilihan", "zikir_selepas_solat", "zikir_pagi", "zikir_petang", "doa_tidur"],
+      "titleMs": "Ayat al-Kursi", "titleEn": "Ayat al-Kursi",
+      "reference": "Al-Quran, Surah Al-Baqarah (2): 255. Bacaan selepas solat: an-Nasa'i, as-Sunan al-Kubra no. 9848 (perlu semakan nombor). Bacaan sebelum tidur: Sahih al-Bukhari no. 2311.",
+      "verification": "perlu_semakan",
+      "ayat": [
+        {"n": 255, "ar": "اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ لَّهُ مَا فِي السَّمَاوَاتِ وَمَا فِي الْأَرْضِ مَن ذَا الَّذِي يَشْفَعُ عِندَهُ إِلَّا بِإِذْنِهِ يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُمْ وَلَا يُحِيطُونَ بِشَيْءٍ مِّنْ عِلْمِهِ إِلَّا بِمَا شَاءَ وَسِعَ كُرْسِيُّهُ السَّمَاوَاتِ وَالْأَرْضَ وَلَا يَئُودُهُ حِفْظُهُمَا وَهُوَ الْعَلِيُّ الْعَظِيمُ", "rumi": "Allāhu lā ilāha illā huwal-ḥayyul-qayyūm, lā ta’khużuhū sinatuw wa lā naum, lahū mā fis-samāwāti wa mā fil-arḍ, man żal-lażī yasyfa‘u ‘indahū illā bi’iżnih, ya‘lamu mā baina aidīhim wa mā khalfahum, wa lā yuḥīṭūna bisyai’im min ‘ilmihī illā bimā syā’, wasi‘a kursiyyuhus-samāwāti wal-arḍ, wa lā ya’ūduhū ḥifẓuhumā, wa huwal-‘aliyyul-‘aẓīm", "ms": "Allah, tiada Tuhan melainkan Dia, Yang Maha Hidup, Yang Maha Berdiri Sendiri mentadbir sekalian makhluk. Dia tidak dilanda mengantuk dan tidak pula tidur. Milik-Nya segala yang ada di langit dan di bumi. Tiada sesiapa yang dapat memberi syafaat di sisi-Nya melainkan dengan izin-Nya. Dia mengetahui apa yang ada di hadapan mereka dan apa yang ada di belakang mereka, sedang mereka tidak mengetahui sesuatu pun daripada ilmu-Nya melainkan apa yang Dia kehendaki. Kursi-Nya meliputi langit dan bumi, dan tidak berat bagi-Nya memelihara kedua-duanya. Dan Dialah Yang Maha Tinggi, lagi Maha Besar."}
+      ]
+    },
+    {
+      "id": "zikir_istighfar", "type": "zikr", "categories": ["zikir_selepas_solat"],
+      "titleMs": "Istighfar", "titleEn": "Seeking forgiveness",
+      "ar": "أَسْتَغْفِرُ اللَّهَ", "rumi": "Astaghfirullāh",
+      "ms": "Aku memohon ampun kepada Allah.",
+      "repeat": 3,
+      "reference": "Sahih Muslim no. 591 (hadis Thauban r.a.)",
+      "verification": "perlu_semakan"
+    },
+    {
+      "id": "zikir_antassalam", "type": "zikr", "categories": ["zikir_selepas_solat"],
+      "titleMs": "Allahumma Antas-Salam", "titleEn": "Allahumma Antas-Salam",
+      "ar": "اللَّهُمَّ أَنْتَ السَّلَامُ وَمِنْكَ السَّلَامُ تَبَارَكْتَ يَا ذَا الْجَلَالِ وَالْإِكْرَامِ",
+      "rumi": "Allāhumma antas-salām wa minkas-salām, tabārakta yā żal-jalāli wal-ikrām",
+      "ms": "Ya Allah, Engkaulah As-Salam (Maha Sejahtera) dan daripada-Mu kesejahteraan. Maha Berkat Engkau, wahai Tuhan yang memiliki keagungan dan kemuliaan.",
+      "reference": "Sahih Muslim no. 591",
+      "verification": "perlu_semakan"
+    },
+    {
+      "id": "zikir_tasbih", "type": "zikr", "categories": ["zikir_selepas_solat"],
+      "titleMs": "Tasbih", "titleEn": "Tasbih",
+      "ar": "سُبْحَانَ اللَّهِ", "rumi": "Subḥānallāh", "ms": "Maha Suci Allah.",
+      "repeat": 33, "reference": "Sahih Muslim no. 597 (hadis Abu Hurairah r.a.)",
+      "verification": "perlu_semakan"
+    },
+    {
+      "id": "zikir_tahmid", "type": "zikr", "categories": ["zikir_selepas_solat"],
+      "titleMs": "Tahmid", "titleEn": "Tahmid",
+      "ar": "الْحَمْدُ لِلَّهِ", "rumi": "Al-ḥamdu lillāh", "ms": "Segala puji bagi Allah.",
+      "repeat": 33, "reference": "Sahih Muslim no. 597",
+      "verification": "perlu_semakan"
+    },
+    {
+      "id": "zikir_takbir", "type": "zikr", "categories": ["zikir_selepas_solat"],
+      "titleMs": "Takbir", "titleEn": "Takbir",
+      "ar": "اللَّهُ أَكْبَرُ", "rumi": "Allāhu akbar", "ms": "Allah Maha Besar.",
+      "repeat": 33, "reference": "Sahih Muslim no. 597",
+      "verification": "perlu_semakan"
+    },
+    {
+      "id": "zikir_tahlil_100", "type": "zikr", "categories": ["zikir_selepas_solat"],
+      "titleMs": "Pelengkap seratus", "titleEn": "Completing the hundred",
+      "ar": "لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ، وَهُوَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ",
+      "rumi": "Lā ilāha illallāhu waḥdahū lā syarīka lah, lahul-mulku wa lahul-ḥamd, wa huwa ‘alā kulli syai’in qadīr",
+      "ms": "Tiada Tuhan melainkan Allah, Yang Maha Esa, tiada sekutu bagi-Nya. Bagi-Nya kerajaan dan bagi-Nya segala pujian, dan Dia Maha Berkuasa atas segala sesuatu.",
+      "reference": "Sahih Muslim no. 597",
+      "verification": "perlu_semakan"
+    },
+    {
+      "id": "zikir_bismillah_la_yadhurru", "type": "zikr", "categories": ["zikir_pagi", "zikir_petang"],
+      "titleMs": "Bismillahil-lazi la yadhurru", "titleEn": "Bismillahil-ladhi la yadurru",
+      "ar": "بِسْمِ اللَّهِ الَّذِي لَا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الْأَرْضِ وَلَا فِي السَّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ",
+      "rumi": "Bismillāhil-lażī lā yaḍurru ma‘asmihī syai’un fil-arḍi wa lā fis-samā’, wa huwas-samī‘ul-‘alīm",
+      "ms": "Dengan nama Allah yang tidak ada sesuatu pun di bumi dan di langit dapat memberi mudarat bersama nama-Nya, dan Dia Maha Mendengar lagi Maha Mengetahui.",
+      "repeat": 3,
+      "reference": "Sunan Abi Dawud no. 5088; Sunan at-Tirmizi no. 3388",
+      "verification": "perlu_semakan"
+    },
+    {
+      "id": "zikir_subhanallah_wabihamdih", "type": "zikr", "categories": ["zikir_pagi", "zikir_petang"],
+      "titleMs": "Subhanallah wa bihamdih", "titleEn": "Subhanallah wa bihamdih",
+      "ar": "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ", "rumi": "Subḥānallāhi wa biḥamdih",
+      "ms": "Maha Suci Allah dan dengan memuji-Nya.",
+      "repeat": 100, "reference": "Sahih Muslim no. 2692",
+      "verification": "perlu_semakan"
+    },
+    {
+      "id": "zikir_radhitu", "type": "zikr", "categories": ["zikir_pagi", "zikir_petang"],
+      "titleMs": "Radhitu billahi rabba", "titleEn": "Raditu billahi rabba",
+      "ar": "رَضِيتُ بِاللَّهِ رَبًّا، وَبِالْإِسْلَامِ دِينًا، وَبِمُحَمَّدٍ صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ نَبِيًّا",
+      "rumi": "Raḍītu billāhi rabbā, wa bil-islāmi dīnā, wa bi-Muḥammadin ṣallallāhu ‘alaihi wa sallama nabiyyā",
+      "ms": "Aku reda Allah sebagai Tuhan, Islam sebagai agama dan Muhammad SAW sebagai nabi.",
+      "repeat": 3,
+      "reference": "Sunan Abi Dawud no. 5072; Sunan at-Tirmizi no. 3389",
+      "note": "Status sanad dibincangkan oleh ulama hadis; sebahagian menilainya hasan. Perlu disemak.",
+      "verification": "perlu_semakan"
+    },
+    {
+      "id": "selawat_ibrahimiyyah", "type": "zikr", "categories": ["selawat"],
+      "titleMs": "Selawat Ibrahimiyyah", "titleEn": "Salawat Ibrahimiyyah",
+      "ar": "اللَّهُمَّ صَلِّ عَلَىٰ مُحَمَّدٍ وَعَلَىٰ آلِ مُحَمَّدٍ، كَمَا صَلَّيْتَ عَلَىٰ إِبْرَاهِيمَ وَعَلَىٰ آلِ إِبْرَاهِيمَ، إِنَّكَ حَمِيدٌ مَجِيدٌ، اللَّهُمَّ بَارِكْ عَلَىٰ مُحَمَّدٍ وَعَلَىٰ آلِ مُحَمَّدٍ، كَمَا بَارَكْتَ عَلَىٰ إِبْرَاهِيمَ وَعَلَىٰ آلِ إِبْرَاهِيمَ، إِنَّكَ حَمِيدٌ مَجِيدٌ",
+      "rumi": "Allāhumma ṣalli ‘alā Muḥammadin wa ‘alā āli Muḥammad, kamā ṣallaita ‘alā Ibrāhīma wa ‘alā āli Ibrāhīm, innaka ḥamīdum majīd. Allāhumma bārik ‘alā Muḥammadin wa ‘alā āli Muḥammad, kamā bārakta ‘alā Ibrāhīma wa ‘alā āli Ibrāhīm, innaka ḥamīdum majīd",
+      "ms": "Ya Allah, limpahkanlah selawat ke atas Muhammad dan keluarga Muhammad sebagaimana Engkau telah melimpahkan selawat ke atas Ibrahim dan keluarga Ibrahim; sesungguhnya Engkau Maha Terpuji lagi Maha Mulia. Ya Allah, berkatilah Muhammad dan keluarga Muhammad sebagaimana Engkau telah memberkati Ibrahim dan keluarga Ibrahim; sesungguhnya Engkau Maha Terpuji lagi Maha Mulia.",
+      "reference": "Sahih al-Bukhari no. 3370 (hadis Ka‘b bin ‘Ujrah r.a.)",
+      "verification": "perlu_semakan"
+    },
+    {
+      "id": "doa_bangun_tidur", "type": "doa", "categories": ["doa_bangun_tidur", "doa_harian"],
+      "titleMs": "Doa bangun tidur", "titleEn": "Upon waking up",
+      "ar": "الْحَمْدُ لِلَّهِ الَّذِي أَحْيَانَا بَعْدَ مَا أَمَاتَنَا وَإِلَيْهِ النُّشُورُ",
+      "rumi": "Al-ḥamdu lillāhil-lażī aḥyānā ba‘da mā amātanā wa ilaihin-nusyūr",
+      "ms": "Segala puji bagi Allah yang telah menghidupkan kami setelah mematikan kami, dan kepada-Nya kami akan dibangkitkan.",
+      "reference": "Sahih al-Bukhari no. 6312",
+      "verification": "perlu_semakan"
+    },
+    {
+      "id": "doa_sebelum_tidur", "type": "doa", "categories": ["doa_tidur", "doa_harian"],
+      "titleMs": "Doa sebelum tidur", "titleEn": "Before sleeping",
+      "ar": "بِاسْمِكَ اللَّهُمَّ أَمُوتُ وَأَحْيَا",
+      "rumi": "Bismikallāhumma amūtu wa aḥyā",
+      "ms": "Dengan nama-Mu ya Allah, aku mati dan aku hidup.",
+      "reference": "Sahih al-Bukhari no. 6312",
+      "verification": "perlu_semakan"
+    },
+    {
+      "id": "doa_sebelum_makan", "type": "doa", "categories": ["doa_makan", "doa_harian"],
+      "titleMs": "Doa sebelum makan", "titleEn": "Before eating",
+      "ar": "بِسْمِ اللَّهِ",
+      "rumi": "Bismillāh",
+      "ms": "Dengan nama Allah. (Jika terlupa di awal: بِسْمِ اللَّهِ أَوَّلَهُ وَآخِرَهُ — Bismillāhi awwalahū wa ākhirah: Dengan nama Allah pada awal dan akhirnya.)",
+      "reference": "Sunan Abi Dawud no. 3767; Sunan at-Tirmizi no. 1858",
+      "verification": "perlu_semakan"
+    },
+    {
+      "id": "doa_selepas_makan", "type": "doa", "categories": ["doa_makan", "doa_harian"],
+      "titleMs": "Doa selepas makan", "titleEn": "After eating",
+      "ar": "الْحَمْدُ لِلَّهِ الَّذِي أَطْعَمَنِي هَٰذَا وَرَزَقَنِيهِ مِنْ غَيْرِ حَوْلٍ مِنِّي وَلَا قُوَّةٍ",
+      "rumi": "Al-ḥamdu lillāhil-lażī aṭ‘amanī hāżā wa razaqanīhi min ghairi ḥaulim minnī wa lā quwwah",
+      "ms": "Segala puji bagi Allah yang telah memberi aku makan makanan ini dan merezekikannya kepadaku tanpa daya dan kekuatan daripadaku.",
+      "reference": "Sunan Abi Dawud no. 4023; Sunan at-Tirmizi no. 3458",
+      "verification": "perlu_semakan"
+    },
+    {
+      "id": "doa_keluar_rumah", "type": "doa", "categories": ["doa_rumah", "doa_harian"],
+      "titleMs": "Doa keluar rumah", "titleEn": "Leaving the house",
+      "ar": "بِسْمِ اللَّهِ تَوَكَّلْتُ عَلَى اللَّهِ، وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ",
+      "rumi": "Bismillāhi tawakkaltu ‘alallāh, wa lā ḥaula wa lā quwwata illā billāh",
+      "ms": "Dengan nama Allah, aku bertawakal kepada Allah; tiada daya dan kekuatan melainkan dengan Allah.",
+      "reference": "Sunan Abi Dawud no. 5095; Sunan at-Tirmizi no. 3426",
+      "verification": "perlu_semakan"
+    },
+    {
+      "id": "doa_masuk_rumah", "type": "doa", "categories": ["doa_rumah", "doa_harian"],
+      "titleMs": "Doa masuk rumah", "titleEn": "Entering the house",
+      "ar": "بِسْمِ اللَّهِ وَلَجْنَا، وَبِسْمِ اللَّهِ خَرَجْنَا، وَعَلَى اللَّهِ رَبِّنَا تَوَكَّلْنَا",
+      "rumi": "Bismillāhi walajnā, wa bismillāhi kharajnā, wa ‘alallāhi rabbinā tawakkalnā",
+      "ms": "Dengan nama Allah kami masuk, dengan nama Allah kami keluar, dan kepada Allah Tuhan kami, kami bertawakal.",
+      "reference": "Sunan Abi Dawud no. 5096",
+      "note": "Sanad hadis ini dipertikaikan (dinilai lemah oleh sebahagian ulama kerana keterputusan sanad). Perlu disemak.",
+      "verification": "perlu_semakan"
+    },
+    {
+      "id": "doa_naik_kenderaan", "type": "doa", "categories": ["doa_perjalanan"],
+      "titleMs": "Doa menaiki kenderaan / perjalanan", "titleEn": "Travel / boarding a vehicle",
+      "ar": "سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَٰذَا وَمَا كُنَّا لَهُ مُقْرِنِينَ، وَإِنَّا إِلَىٰ رَبِّنَا لَمُنقَلِبُونَ",
+      "rumi": "Subḥānal-lażī sakhkhara lanā hāżā wa mā kunnā lahū muqrinīn, wa innā ilā rabbinā lamunqalibūn",
+      "ms": "Maha Suci Tuhan yang telah memudahkan kenderaan ini bagi kami, sedangkan kami sebelum itu tidak berupaya menguasainya. Dan sesungguhnya kepada Tuhan kamilah kami akan kembali.",
+      "reference": "Al-Quran, Surah Az-Zukhruf (43): 13–14; Sahih Muslim no. 1342 (doa safar)",
+      "verification": "perlu_semakan"
+    },
+    {
+      "id": "doa_ibu_bapa", "type": "doa", "categories": ["doa_ibu_bapa", "doa_harian"],
+      "titleMs": "Doa untuk ibu bapa", "titleEn": "For parents",
+      "ar": "رَّبِّ ارْحَمْهُمَا كَمَا رَبَّيَانِي صَغِيرًا",
+      "rumi": "Rabbir-ḥamhumā kamā rabbayānī ṣaghīrā",
+      "ms": "Wahai Tuhanku, kasihanilah mereka berdua sebagaimana mereka telah memelihara dan mendidikku semasa kecil.",
+      "reference": "Al-Quran, Surah Al-Isra' (17): 24",
+      "verification": "perlu_semakan"
+    },
+    {
+      "id": "doa_ampun_ibu_bapa", "type": "doa", "categories": ["doa_ibu_bapa"],
+      "titleMs": "Doa keampunan untuk diri dan ibu bapa", "titleEn": "Forgiveness for self and parents",
+      "ar": "رَبَّنَا اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+      "rumi": "Rabbanaghfir lī wa liwālidayya wa lil-mu’minīna yauma yaqūmul-ḥisāb",
+      "ms": "Wahai Tuhan kami, ampunilah aku, kedua ibu bapaku dan orang-orang yang beriman pada hari berlakunya hisab.",
+      "reference": "Al-Quran, Surah Ibrahim (14): 41",
+      "verification": "perlu_semakan"
+    },
+    {
+      "id": "doa_perlindungan", "type": "doa", "categories": ["doa_perlindungan", "zikir_petang"],
+      "titleMs": "Doa memohon perlindungan", "titleEn": "Seeking protection",
+      "ar": "أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ",
+      "rumi": "A‘ūżu bikalimātillāhit-tāmmāti min syarri mā khalaq",
+      "ms": "Aku berlindung dengan kalimah-kalimah Allah yang sempurna daripada kejahatan makhluk yang Dia ciptakan.",
+      "reference": "Sahih Muslim no. 2708 dan 2709",
+      "verification": "perlu_semakan"
+    },
+    {
+      "id": "doa_sapu_jagat", "type": "doa", "categories": ["doa_selepas_solat", "doa_harian"],
+      "titleMs": "Doa kebaikan dunia dan akhirat", "titleEn": "Good in this world and the Hereafter",
+      "ar": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+      "rumi": "Rabbanā ātinā fid-dunyā ḥasanah, wa fil-ākhirati ḥasanah, wa qinā ‘ażāban-nār",
+      "ms": "Wahai Tuhan kami, kurniakanlah kepada kami kebaikan di dunia dan kebaikan di akhirat, dan peliharalah kami daripada azab neraka.",
+      "reference": "Al-Quran, Surah Al-Baqarah (2): 201; Sahih al-Bukhari no. 6389",
+      "verification": "perlu_semakan"
+    },
+    {
+      "id": "doa_tambah_ilmu", "type": "doa", "categories": ["doa_harian"],
+      "titleMs": "Doa menambah ilmu", "titleEn": "Increase in knowledge",
+      "ar": "رَّبِّ زِدْنِي عِلْمًا",
+      "rumi": "Rabbi zidnī ‘ilmā",
+      "ms": "Wahai Tuhanku, tambahkanlah ilmuku.",
+      "reference": "Al-Quran, Surah Taha (20): 114",
+      "verification": "perlu_semakan"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 320x180 Android TV launcher banner: emerald background, gold crescent and title. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <gradient android:startColor="#FF06231B" android:endColor="#FF0E7A5A" android:angle="0" />
+            <size android:width="320dp" android:height="180dp" />
+        </shape>
+    </item>
+    <item android:drawable="@drawable/ic_banner_mark" android:gravity="center" />
+</layer-list>
