@@ -54,6 +54,19 @@ without a native layer; overflows at phone width (next-prayer name in English,
 tasbih target chips); Display Mode overflowing in portrait; an invisible
 full-page focus node (idle timer wrapper) that trapped the TV remote.
 
+## CI emulator smoke test (GitHub Actions, Android 14 x86_64)
+
+Job `smoke-test` installs the APK, launches it and requires the process to be
+alive after 30 s; crash and Flutter logs are printed and uploaded.
+
+- Run #3 **reproduced the crash reported on a Galaxy S21** ("opens briefly
+  then closes"): `SecurityException: ACCESS_NETWORK_STATE required for jobs
+  with a connectivity constraint` from `BackgroundSyncJob.ensureScheduled`.
+- Fixed by declaring `ACCESS_NETWORK_STATE` and making job scheduling
+  non-fatal. Run #4: **smoke test passed** (app running after 30 s).
+- Also hardened start-up: no drift `shareAcrossIsolates` (could retry
+  forever) and a visible start-up error screen instead of a frozen splash.
+
 ## NOT executed: required on-device matrix
 
 Run on at least one phone (Android 13/14/15), one tablet and one Android TV
