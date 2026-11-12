@@ -2,6 +2,9 @@
 
     <!-- Network: prayer timetable download (HTTPS only) and optional audio downloads. -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Required (Android 14+) for the background job's "network available"
+         constraint. Normal permission: no user prompt. -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <!-- Android 13+: runtime permission for prayer notifications. -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <!-- Android 12+: exact alarms for azan. User-grantable; the app degrades to

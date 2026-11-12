@@ -31,16 +31,24 @@ class BackgroundSyncJob : JobService() {
         private const val TIMEOUT_MS = 4 * 60 * 1000L
         private const val PREFS = "rumahazan_background"
 
-        /** Idempotent: schedules the periodic job only if not already pending. */
+        /**
+         * Idempotent: schedules the periodic job only if not already pending.
+         * Never throws: a scheduling problem must not stop the app opening
+         * (it is reported in Diagnostics instead).
+         */
         fun ensureScheduled(ctx: Context) {
-            val js = ctx.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
-            if (js.getPendingJob(JOB_ID) != null) return
-            val info = JobInfo.Builder(JOB_ID, ComponentName(ctx, BackgroundSyncJob::class.java))
-                .setPeriodic(24 * 60 * 60 * 1000L)
-                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
-                .setPersisted(true) // survives reboot (RECEIVE_BOOT_COMPLETED)
-                .build()
-            js.schedule(info)
+            try {
+                val js = ctx.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
+                if (js.getPendingJob(JOB_ID) != null) return
+                val info = JobInfo.Builder(JOB_ID, ComponentName(ctx, BackgroundSyncJob::class.java))
+                    .setPeriodic(24 * 60 * 60 * 1000L)
+                    .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY) // needs ACCESS_NETWORK_STATE
+                    .setPersisted(true) // survives reboot (RECEIVE_BOOT_COMPLETED)
+                    .build()
+                js.schedule(info)
+            } catch (t: Throwable) {
+                com.rumahazan.app.scheduler.Scheduler.setLastError(ctx, "Background job: ${t.javaClass.simpleName}: ${t.message}")
+            }
         }
 
         fun lastRunAt(ctx: Context): Long =
