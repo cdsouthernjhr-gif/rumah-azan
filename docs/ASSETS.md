@@ -35,4 +35,5 @@ Scheherazade New) can be added to `assets/fonts/` and declared in `pubspec.yaml`
 
 `android/app/src/main/res/drawable/ic_stat_azan.xml` (notification) and
 `tv_banner.xml` (Android TV) are original vector drawables. The launcher icon
-is still the Flutter default and should be replaced before release.
+is original: an adaptive vector icon (`mipmap-anydpi-v26`, Android 8+) and
+PNGs for Android 7.x, both an emerald tile with a gold crescent and star.

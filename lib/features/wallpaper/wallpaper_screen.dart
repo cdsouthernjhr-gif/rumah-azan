@@ -164,6 +164,35 @@ class WallpaperScreen extends ConsumerWidget {
               },
             ),
           ),
+        if (active.startsWith('custom:')) ...[
+          SectionHeader(context.tr('frame_image')),
+          ListTile(
+            title: Text(context.tr('zoom')),
+            subtitle: CommitSlider(
+              value: s.wpZoom,
+              min: 1,
+              max: 3,
+              divisions: 20,
+              labelOf: (v) => '${v.toStringAsFixed(1)}×',
+              onCommit: (v) => notifier.update({'wpZoom': v}),
+            ),
+          ),
+          ListTile(
+            title: Text(context.tr('position_x')),
+            subtitle: CommitSlider(value: s.wpAlignX, min: -1, max: 1, divisions: 20, onCommit: (v) => notifier.update({'wpAlignX': v})),
+          ),
+          ListTile(
+            title: Text(context.tr('position_y')),
+            subtitle: CommitSlider(value: s.wpAlignY, min: -1, max: 1, divisions: 20, onCommit: (v) => notifier.update({'wpAlignY': v})),
+          ),
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton(
+              onPressed: () => notifier.update({'wpZoom': 1.0, 'wpAlignX': 0.0, 'wpAlignY': 0.0}),
+              child: Text(context.tr('reset')),
+            ),
+          ),
+        ],
         SectionHeader(context.tr('wallpaper_effects')),
         ListTile(
           title: Text(context.tr('brightness')),
@@ -197,7 +226,7 @@ class WallpaperScreen extends ConsumerWidget {
               for (final k in [
                 'wallpaperAuto', 'wallpaperFixed', 'wallpaperMorning', 'wallpaperAfternoon', 'wallpaperEvening',
                 'wallpaperNight', 'slotMorning', 'slotAfternoon', 'slotEvening', 'slotNight', 'wpBrightness',
-                'wpOverlay', 'wpBlur', 'wpFit',
+                'wpOverlay', 'wpBlur', 'wpFit', 'wpZoom', 'wpAlignX', 'wpAlignY',
               ])
                 k: AppSettings.defaults[k],
             }),

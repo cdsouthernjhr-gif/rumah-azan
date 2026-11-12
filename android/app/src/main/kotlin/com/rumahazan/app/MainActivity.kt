@@ -10,6 +10,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
+import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Build
 import android.os.PowerManager
@@ -170,8 +171,28 @@ class MainActivity : FlutterActivity() {
             "setRepeatMode" -> cmd(PlaybackService.ACTION_REPEAT, result) { it.putExtra("mode", call.argument<String>("mode") ?: "off") }
             "setShuffle" -> cmd(PlaybackService.ACTION_SHUFFLE, result) { it.putExtra("on", call.argument<Boolean>("on") ?: false) }
             "playerState" -> result.success(PlaybackService.state)
+            "audioDuration" -> {
+                // Off the main thread: metadata extraction touches the file.
+                val path = call.argument<String>("path") ?: ""
+                Thread {
+                    val ms = readDurationMs(path)
+                    runOnUiThread { result.success(ms) }
+                }.start()
+            }
 
             else -> result.notImplemented()
+        }
+    }
+
+    private fun readDurationMs(path: String): Long? {
+        val r = MediaMetadataRetriever()
+        return try {
+            r.setDataSource(path)
+            r.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLongOrNull()
+        } catch (_: Exception) {
+            null
+        } finally {
+            try { r.release() } catch (_: Exception) {}
         }
     }
 

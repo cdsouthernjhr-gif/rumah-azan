@@ -66,12 +66,12 @@ improvement / on-device verification.
 | Hijri calendar (JAKIM Hijri → official override → calculation ±2) | A | Unit-tested; calculated dates are labelled. |
 | Islamic events (11 events, official-date entry) | A | Unit-tested. |
 | Quran / zikr / doa library (search, favourites, copy, share) | B | Structure complete; **32 texts included, all marked `perlu_semakan` (needs review)**. Full mushaf not bundled. |
-| Audio library (import, HTTPS download manager, playlists) | E | No audio bundled (no licensed recordings available). Needs device test. |
+| Audio library (import, HTTPS download manager, playlists, durations, playback history) | E | No audio bundled (no licensed recordings available). Needs device test. |
 | Native audio engine (foreground service, focus, queue, priority) | E | Kotlin type-checks against the Android framework; **not run on a device**. |
 | Audio scheduler planner (before/at/after, overlap, duplicates, sleep) | A | Unit-tested. |
 | Native AlarmManager scheduler, boot/time/tz/update receivers | E | Kotlin type-checks; needs on-device verification (see the test matrix). |
-| Notifications (channels, per-prayer, reminder, silent, DND) | E | Implemented natively; needs device test. |
-| Wallpapers (9 procedural built-ins, import, brightness/overlay/blur, fit, time slots) | A/E | Crop is not implemented (fit/fill only). |
+| Notifications (channels, per-prayer, reminder, silent, DND, daily zikr, Islamic events, recitation start) | E | Planning unit-tested; posting implemented natively; needs device test. |
+| Wallpapers (9 procedural built-ins, import, framing zoom/position, brightness/overlay/blur, fit, time slots) | A/E | Framing is zoom + focal point, not a free-form crop. |
 | Themes (4) + automatic theme by time slot + font scale | A | |
 | Smart Display / TV mode (D-pad, screensaver, slideshow, keep-screen-on opt-in, auto-return) | A/E | Widget-tested at 1280×720; needs a real TV remote test. |
 | Sleep Mode (manual/scheduled, window brightness only, Subuh countdown) | A | Widget-tested. |

@@ -116,16 +116,22 @@ class _CustomWallpaper extends ConsumerWidget {
     }
     // Decode at screen resolution only — keeps memory low on TV boxes.
     final mq = MediaQuery.of(context);
-    final px = (mq.size.longestSide * mq.devicePixelRatio).round().clamp(480, 2560);
-    return Image.file(
+    final s = ref.watch(settingsProvider);
+    // Framing ("crop"): zoom in around a user-chosen focal point.
+    final focal = Alignment(s.wpAlignX, s.wpAlignY);
+    final px = (mq.size.longestSide * mq.devicePixelRatio * s.wpZoom).round().clamp(480, 3840);
+    final image = Image.file(
       File(row.filePath),
       fit: fit,
+      alignment: focal,
       cacheWidth: mq.size.width >= mq.size.height ? px : null,
       cacheHeight: mq.size.width < mq.size.height ? px : null,
       gaplessPlayback: true,
       errorBuilder: (_, _, _) =>
           CustomPaint(painter: BuiltinWallpaperPainter(builtinWallpapers.last), size: Size.infinite),
     );
+    if (s.wpZoom <= 1.001) return image;
+    return ClipRect(child: Transform.scale(scale: s.wpZoom, alignment: focal, child: image));
   }
 }
 

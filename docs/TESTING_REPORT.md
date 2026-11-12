@@ -8,7 +8,7 @@ device, no access to the JAKIM host.
 | Command | Result |
 |---|---|
 | `flutter analyze` | **No issues found** |
-| `flutter test` | **63 tests passed, 0 failed** |
+| `flutter test` | **66 tests passed, 0 failed** |
 | Kotlin type-check (kotlinc 2.4.20 vs Android framework + Flutter embedding) | **0 errors**; all 15 classes compiled |
 | `flutter build apk --debug` | **Not possible**: "No Android SDK found" (SDK download host blocked) |
 
@@ -28,7 +28,8 @@ device, no access to the JAKIM host.
   re-planning, before ends before azan, after clipped before the next
   content, past events skipped (missed transitions), estimates opt-in,
   automatic audio off, no azan file → sound fallback, silent mode, sleep
-  window, config clamping.
+  window, config clamping, daily/dated info notices, optional
+  before-recitation notification.
 - **Database:** schema creation (migration v1), zone seeding, idempotent
   upsert, estimates never persisted, verified→estimate→null resolution,
   settings/config persistence, backup round-trip with id remapping, invalid

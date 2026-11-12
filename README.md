@@ -22,8 +22,9 @@ Package: `com.rumahazan.app` · Flutter 3.50 · Android 7.0 (API 24) dan ke atas
   solat (lewat mula, tempoh maksimum, ulangan, kelantangan, senarai main).
   Satu enjin audio native: azan memintas bacaan, bacaan beratur, tiada
   pertindihan.
-- **Pemberitahuan** setiap waktu, peringatan awal, getaran; menghormati mod
-  senyap dan Jangan Ganggu.
+- **Pemberitahuan** setiap waktu, peringatan awal, getaran, peringatan zikir
+  pagi/petang, peringatan peristiwa Islam, notis bacaan bermula; menghormati
+  mod senyap dan Jangan Ganggu. Jadual dirancang **30 hari** ke hadapan.
 - **Kalendar Hijrah** dengan 11 peristiwa penting; membezakan tarikh
   **takwim JAKIM**, **rasmi** (dimasukkan selepas pengumuman) dan **kiraan**;
   pelarasan ±2 hari.
@@ -32,9 +33,10 @@ Package: `com.rumahazan.app` · Flutter 3.50 · Android 7.0 (API 24) dan ke atas
   rujukan; kegemaran, carian, salin, kongsi. *Semua masih perlu semakan
   bertauliah.*
 - **Pustaka audio:** import fail sendiri, muat turun HTTPS, senarai main,
-  pemain penuh (main/jeda/henti/seterusnya/sebelum/ulang/rawak/kelantangan).
+  pemain penuh (main/jeda/henti/seterusnya/sebelum/ulang/rawak/kelantangan),
+  tempoh audio dan sejarah main balik.
 - **Wallpaper & tema:** 9 wallpaper Islamik dilukis secara vektor, import
-  imej sendiri, kecerahan/lapisan gelap/kabur/muatan, pertukaran automatik
+  imej sendiri, bingkai (zum & kedudukan), kecerahan/lapisan gelap/kabur/muatan, pertukaran automatik
   pagi/tengah hari/petang/malam, 4 tema, saiz fon.
 - **Mod Paparan (Smart Mosque/Home Display):** jam besar, tarikh, zon, kiraan
   detik besar, jadual penuh, panel pengumuman, tayangan slaid, penyelamat
@@ -108,10 +110,11 @@ ditolak; aplikasi beralih ke penggera tidak tepat dan memaparkannya),
 - Hijri dates beyond the cached JAKIM data are **calculated** (tabular) and may
   differ by ±1 day from official announcements until an official date is entered.
 - Zone coordinates are approximate (GPS suggestion and estimate only).
-- No image crop tool (fit/fill + effects only). Default launcher icon not yet replaced.
+- Image "crop" is zoom + focal-point framing (non-destructive), not a free-form crop tool.
 - The timetable is refreshed when the app opens; there is no background
-  network job. If the app is not opened for about 7 days the schedule runs
-  out (a notification warns 24 h ahead).
+  network job. Alarms are planned 30 days ahead, so the schedule only runs
+  out if the app is not opened for about a month (a notification warns 24 h
+  ahead).
 
 ## English summary
 

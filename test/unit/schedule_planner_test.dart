@@ -15,6 +15,8 @@ PlannerInput input({
   bool auto = true,
   bool allowEstimate = false,
   (int, int)? sleep,
+  List<InfoNotice> notices = const [],
+  bool notifyBefore = false,
 }) =>
     PlannerInput(
       now: now,
@@ -40,6 +42,8 @@ PlannerInput input({
       autoAudioEnabled: auto,
       allowEstimate: allowEstimate,
       sleepWindow: sleep,
+      notices: notices,
+      notifyBeforeRecitation: notifyBefore,
     );
 
 void main() {
@@ -133,5 +137,42 @@ void main() {
     expect(c.afterRepeat, 1);
     expect(PrayerAudioConfig.defaultFor(Prayer.subuh).beforeMinutes, 15);
     expect(PrayerAudioConfig.defaultFor(Prayer.zohor).beforeMinutes, 10);
+  });
+
+  group('info notices (daily zikr, Islamic events)', () {
+    const morning = InfoNotice(key: 'zikir_pagi', minuteOfDay: 7 * 60, title: 'Zikir pagi', body: 'b');
+    const event = InfoNotice(
+        key: 'event_x', minuteOfDay: 8 * 60, title: 'Maulidur Rasul', body: 'b', dateKey: '2026-11-13', nonEssential: false);
+
+    test('daily notice once per day in horizon, dated notice only on its date', () {
+      final events = planner.plan(input(now: myt('2026-11-12', '00:00'), notices: const [morning, event]));
+      final info = events.where((e) => e.kind == ScheduledKind.info).map((e) => e.id).toList();
+      expect(info, ['2026-11-12_info_zikir_pagi', '2026-11-13_info_zikir_pagi', '2026-11-13_info_event_x']);
+      final ev = events.firstWhere((e) => e.id == '2026-11-13_info_event_x');
+      expect(ev.triggerAt, myt('2026-11-13', '08:00'));
+      expect(ev.notifySound, isTrue);
+      expect(ev.items, isEmpty);
+    });
+
+    test('past notices skipped; sleep window mutes only non-essential ones', () {
+      final late = planner.plan(input(now: myt('2026-11-12', '09:00'), notices: const [morning]));
+      expect(late.any((e) => e.id == '2026-11-12_info_zikir_pagi'), isFalse);
+      final sleeping = planner.plan(input(
+        now: myt('2026-11-12', '00:00'),
+        notices: const [morning, InfoNotice(key: 'event_y', minuteOfDay: 7 * 60, title: 't', body: 'b', nonEssential: false)],
+        sleep: (6 * 60, 8 * 60),
+      ));
+      expect(sleeping.any((e) => e.id.endsWith('zikir_pagi')), isFalse);
+      expect(sleeping.any((e) => e.id.endsWith('event_y')), isTrue);
+    });
+
+    test('before-recitation notification is optional', () {
+      bool notifies(bool on) => planner
+          .plan(input(now: myt('2026-11-12', '00:00'), notifyBefore: on))
+          .firstWhere((e) => e.kind == ScheduledKind.before)
+          .notify;
+      expect(notifies(false), isFalse);
+      expect(notifies(true), isTrue);
+    });
   });
 }

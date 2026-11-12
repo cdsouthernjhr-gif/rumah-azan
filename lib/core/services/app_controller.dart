@@ -1,8 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../data/models/app_settings.dart';
 import '../../data/models/prayer_day.dart';
 import '../../data/providers/providers.dart';
 import '../../features/audio_scheduler/domain/schedule_planner.dart';
+import '../../features/islamic_calendar/domain/calendar_service.dart';
 import '../constants/app_constants.dart';
 import '../l10n/l10n.dart';
 import '../utilities/myt_time.dart';
@@ -28,7 +30,7 @@ class AppController {
     if (!force) {
       final last = await repo.lastCachedDate(zone);
       final fetched = await repo.lastFetchedAt(zone);
-      final horizon = Myt.addDays(Myt.todayKey(), AppConstants.schedulerHorizonDays);
+      final horizon = Myt.addDays(Myt.todayKey(), AppConstants.refreshCoverageDays);
       final recent = fetched != null && DateTime.now().toUtc().difference(fetched) < const Duration(days: 3);
       // Enough recent data cached for the scheduler horizon → avoid requests.
       if (last != null && last.compareTo(horizon) >= 0 && recent) return;
@@ -97,6 +99,8 @@ class AppController {
         },
         autoAudioEnabled: settings.autoAudioEnabled,
         allowEstimate: settings.allowEstimateForAlarms,
+        notices: await _notices(settings, l10n),
+        notifyBeforeRecitation: settings.notifyBeforeRecitation,
         sleepWindow: settings.sleepScheduled && settings.sleepMuteNonEssential && start != null && end != null
             ? (start, end)
             : null,
@@ -130,6 +134,37 @@ class AppController {
       await diag.error('scheduler', '$e');
       return 0;
     }
+  }
+
+  /// Daily zikr reminders and Islamic event notices for the horizon.
+  Future<List<InfoNotice>> _notices(AppSettings s, L10n l10n) async {
+    final out = <InfoNotice>[];
+    void daily(bool on, String key, String time, String titleKey, String bodyKey) {
+      final m = Myt.parseHm(time);
+      if (!on || m == null) return;
+      out.add(InfoNotice(key: key, minuteOfDay: m, title: l10n.t(titleKey), body: l10n.t(bodyKey)));
+    }
+
+    daily(s.zikrMorningReminder, 'zikir_pagi', s.zikrMorningTime, 'notif_zikir_pagi_title', 'notif_zikir_pagi_body');
+    daily(s.zikrEveningReminder, 'zikir_petang', s.zikrEveningTime, 'notif_zikir_petang_title', 'notif_zikir_petang_body');
+
+    final eventMinute = Myt.parseHm(s.eventReminderTime);
+    if (s.eventReminder && eventMinute != null) {
+      final cal = await ref.read(calendarServiceProvider.future);
+      for (final e in cal.eventsBetween(Myt.todayKey(), AppConstants.schedulerHorizonDays)) {
+        out.add(InfoNotice(
+          key: 'event_${e.def.key}',
+          dateKey: e.dateKey,
+          minuteOfDay: eventMinute,
+          title: e.def.name(s.language),
+          body: e.source == HijriSource.calculated
+              ? '${e.def.desc(s.language)} ${l10n.t('notif_event_calculated')}'
+              : e.def.desc(s.language),
+          nonEssential: false,
+        ));
+      }
+    }
+    return out;
   }
 
   /// Imports playback history recorded natively (while app was closed).

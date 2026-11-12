@@ -147,6 +147,20 @@ class AudioRepository {
     if (await f.exists()) await f.delete();
   }
 
+  /// Fills in missing durations using [probe] (native metadata reader).
+  Future<int> backfillDurations(Future<int?> Function(String path) probe) async {
+    final rows = await (db.select(db.audioLibrary)..where((t) => t.durationMs.isNull())).get();
+    var n = 0;
+    for (final r in rows) {
+      final ms = await probe(r.filePath);
+      if (ms == null || ms <= 0) continue;
+      await (db.update(db.audioLibrary)..where((t) => t.id.equals(r.id)))
+          .write(AudioLibraryCompanion(durationMs: Value(ms)));
+      n++;
+    }
+    return n;
+  }
+
   // ---- Playlists ----------------------------------------------------------
   Stream<List<PlaylistRow>> watchPlaylists() => db.select(db.audioPlaylists).watch();
   Future<List<PlaylistRow>> playlists() => db.select(db.audioPlaylists).get();

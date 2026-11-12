@@ -5,6 +5,7 @@ import 'package:path/path.dart' as p;
 
 import '../../core/l10n/l10n.dart';
 import '../../core/services/app_controller.dart';
+import '../../core/utilities/myt_time.dart';
 import '../../data/local/database.dart';
 import '../../data/providers/providers.dart';
 import '../../data/repositories/audio_repository.dart';
@@ -20,7 +21,27 @@ class AudioLibraryScreen extends ConsumerStatefulWidget {
   ConsumerState<AudioLibraryScreen> createState() => _AudioLibraryScreenState();
 }
 
+final playbackHistoryProvider = FutureProvider.autoDispose<List<PlaybackHistoryRow>>((ref) async {
+  // Pull anything the native layer recorded while the app was closed.
+  final entries = await ref.read(nativeBridgeProvider).drainPlaybackHistory();
+  final repo = ref.read(audioRepoProvider);
+  if (entries.isNotEmpty) await repo.addHistory(entries);
+  return repo.history(100);
+});
+
 class _AudioLibraryScreenState extends ConsumerState<AudioLibraryScreen> {
+  @override
+  void initState() {
+    super.initState();
+    _backfill();
+  }
+
+  /// Reads durations for files that do not have one yet (native, off-thread).
+  Future<void> _backfill() async {
+    final bridge = ref.read(nativeBridgeProvider);
+    await ref.read(audioRepoProvider).backfillDurations(bridge.audioDuration);
+  }
+
   String? _category;
   double? _download;
   bool _downloading = false;
@@ -46,6 +67,7 @@ class _AudioLibraryScreenState extends ConsumerState<AudioLibraryScreen> {
       }
     }
     if (mounted) showSnack(context, context.tr('imported_n', {'n': ok}));
+    await _backfill();
     ref.read(appControllerProvider).resyncSchedule();
   }
 
@@ -73,6 +95,7 @@ class _AudioLibraryScreenState extends ConsumerState<AudioLibraryScreen> {
             licenseNote: uri.host,
             onProgress: (pr) => mounted ? setState(() => _download = pr.fraction) : null,
           );
+      await _backfill();
       if (mounted) showSnack(context, context.tr('download_done'));
     } catch (e) {
       if (mounted) showSnack(context, '${context.tr('download_failed')}: $e');
@@ -105,11 +128,15 @@ class _AudioLibraryScreenState extends ConsumerState<AudioLibraryScreen> {
     final rows = ref.watch(audioListProvider).value ?? const [];
     final filtered = _category == null ? rows : rows.where((r) => r.category == _category).toList();
     return DefaultTabController(
-      length: 2,
+      length: 3,
       child: Scaffold(
         appBar: AppBar(
           title: Text(context.tr('audio')),
-          bottom: TabBar(tabs: [Tab(text: context.tr('library')), Tab(text: context.tr('playlists'))]),
+          bottom: TabBar(tabs: [
+            Tab(text: context.tr('library')),
+            Tab(text: context.tr('playlists')),
+            Tab(text: context.tr('history')),
+          ]),
           actions: [
             IconButton(tooltip: context.tr('download_audio'), icon: const Icon(Icons.download_rounded), onPressed: _downloadDialog),
             IconButton(tooltip: context.tr('import_audio'), icon: const Icon(Icons.add_rounded), onPressed: _import),
@@ -145,7 +172,9 @@ class _AudioLibraryScreenState extends ConsumerState<AudioLibraryScreen> {
                       return ListTile(
                         leading: const Icon(Icons.audiotrack_rounded),
                         title: Text(r.title),
-                        subtitle: Text(context.tr('acat_${r.category}')),
+                        subtitle: Text(r.durationMs == null
+                            ? context.tr('acat_${r.category}')
+                            : '${context.tr('acat_${r.category}')} · ${fmtMs(r.durationMs!)}'),
                         onTap: () => _playList(filtered, i),
                         trailing: PopupMenuButton<String>(
                           onSelected: (v) async {
@@ -170,6 +199,7 @@ class _AudioLibraryScreenState extends ConsumerState<AudioLibraryScreen> {
                 ),
               ]),
               const _PlaylistsTab(),
+              const _HistoryTab(),
             ]),
           ),
         ]),
@@ -350,6 +380,46 @@ class _PlaylistEditorScreenState extends ConsumerState<PlaylistEditorScreen> {
                     await _save();
                   },
                 ),
+              ),
+            ),
+    );
+  }
+}
+
+class _HistoryTab extends ConsumerWidget {
+  const _HistoryTab();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final rows = ref.watch(playbackHistoryProvider);
+    return rows.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, _) => Center(child: Text('$e')),
+      data: (list) => list.isEmpty
+          ? Center(child: Text(context.tr('no_history')))
+          : RefreshIndicator(
+              onRefresh: () async => ref.invalidate(playbackHistoryProvider),
+              child: ListView.builder(
+                itemCount: list.length,
+                itemBuilder: (_, i) {
+                  final h = list[i];
+                  final ok = h.status == 'played';
+                  return ListTile(
+                    dense: true,
+                    leading: Icon(
+                      ok ? Icons.check_circle_outline : Icons.info_outline,
+                      color: ok ? Colors.green : Colors.orange,
+                    ),
+                    title: Text(h.title),
+                    subtitle: Text('${context.tr('status_${h.status}')}'
+                        '${h.detail == null ? '' : ' · ${h.detail}'}'),
+                    trailing: Text(
+                      '${Myt.dateKey(h.startedAt)}\n${Myt.hhmm(h.startedAt)}',
+                      textAlign: TextAlign.right,
+                      style: Theme.of(context).textTheme.labelSmall,
+                    ),
+                  );
+                },
               ),
             ),
     );

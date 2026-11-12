@@ -17,8 +17,12 @@ class AppConstants {
   static const nativeChannel = 'com.rumahazan.app/native';
   static const playerEventsChannel = 'com.rumahazan.app/player_events';
 
-  /// Number of days ahead the audio scheduler plans.
-  static const schedulerHorizonDays = 7;
+  /// Number of days ahead the audio scheduler plans (alarms keep working
+  /// this long even if the app is never opened).
+  static const schedulerHorizonDays = 30;
+
+  /// Refresh the timetable when fewer than this many future days are cached.
+  static const refreshCoverageDays = 7;
 
   /// Kaabah coordinates (Masjidil Haram, Makkah).
   static const kaabahLat = 21.4225;

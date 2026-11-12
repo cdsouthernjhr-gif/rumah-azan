@@ -50,7 +50,7 @@ class _RumahAzanAppState extends ConsumerState<RumahAzanApp> with WidgetsBinding
     final slotTheme = s.autoThemeFromSlot ? themeForSlot(ref.watch(activeSlotProvider)) : s.theme;
     final palette = sleeping ? AppPalette.sleep : AppPalette.of(slotTheme);
 
-    // Re-plan alarms when the date rolls over (keeps the 7-day horizon full).
+    // Re-plan alarms when the date rolls over (keeps the planning horizon full).
     ref.listen(todayKeyProvider, (prev, next) {
       if (prev != null && prev != next) ref.read(appControllerProvider).resyncSchedule();
     });

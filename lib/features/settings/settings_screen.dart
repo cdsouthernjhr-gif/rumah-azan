@@ -145,6 +145,48 @@ class SettingsScreen extends ConsumerWidget {
           onChanged: (v) => resync({'respectSilentMode': v}),
         ),
 
+        // EXTRA NOTIFICATIONS
+        SectionHeader(context.tr('extra_notifications')),
+        SwitchListTile(
+          title: Text(context.tr('zikir_morning_reminder')),
+          subtitle: Text(s.zikrMorningTime),
+          value: s.zikrMorningReminder,
+          onChanged: (v) => resync({'zikrMorningReminder': v}),
+          secondary: IconButton(
+            tooltip: context.tr('change_time'),
+            icon: const Icon(Icons.schedule),
+            onPressed: () => pickTime('zikrMorningTime', s.zikrMorningTime),
+          ),
+        ),
+        SwitchListTile(
+          title: Text(context.tr('zikir_evening_reminder')),
+          subtitle: Text(s.zikrEveningTime),
+          value: s.zikrEveningReminder,
+          onChanged: (v) => resync({'zikrEveningReminder': v}),
+          secondary: IconButton(
+            tooltip: context.tr('change_time'),
+            icon: const Icon(Icons.schedule),
+            onPressed: () => pickTime('zikrEveningTime', s.zikrEveningTime),
+          ),
+        ),
+        SwitchListTile(
+          title: Text(context.tr('event_reminder')),
+          subtitle: Text('${context.tr('event_reminder_sub')} · ${s.eventReminderTime}'),
+          value: s.eventReminder,
+          onChanged: (v) => resync({'eventReminder': v}),
+          secondary: IconButton(
+            tooltip: context.tr('change_time'),
+            icon: const Icon(Icons.schedule),
+            onPressed: () => pickTime('eventReminderTime', s.eventReminderTime),
+          ),
+        ),
+        SwitchListTile(
+          title: Text(context.tr('notify_before_recitation')),
+          subtitle: Text(context.tr('notify_before_recitation_sub')),
+          value: s.notifyBeforeRecitation,
+          onChanged: (v) => resync({'notifyBeforeRecitation': v}),
+        ),
+
         // APPEARANCE
         SectionHeader(context.tr('appearance')),
         ListTile(

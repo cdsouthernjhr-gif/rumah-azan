@@ -9,7 +9,32 @@ class AudioRef {
   Map<String, Object?> toJson() => {'path': path, 'title': title};
 }
 
-enum ScheduledKind { reminder, before, azan, after }
+enum ScheduledKind { reminder, before, azan, after, info }
+
+/// A notification-only notice planned at a wall-clock time (MYT), either
+/// every day (daily zikr reminders) or on one date (Islamic events).
+class InfoNotice {
+  const InfoNotice({
+    required this.key,
+    required this.minuteOfDay,
+    required this.title,
+    required this.body,
+    this.dateKey,
+    this.nonEssential = true,
+  });
+
+  /// Stable key used in the event id.
+  final String key;
+  final int minuteOfDay;
+  final String title;
+  final String body;
+
+  /// Null = every day in the horizon; otherwise only on this date.
+  final String? dateKey;
+
+  /// Suppressed during the sleep window when muting non-essential notices.
+  final bool nonEssential;
+}
 
 /// One alarm the native scheduler will fire. Serialised to JSON and handed to
 /// the Android AlarmManager layer, which stores it (survives reboot) and
@@ -94,6 +119,8 @@ class PlannerInput {
     this.autoAudioEnabled = true,
     this.allowEstimate = false,
     this.sleepWindow,
+    this.notices = const [],
+    this.notifyBeforeRecitation = false,
   });
 
   final DateTime now;
@@ -112,6 +139,12 @@ class PlannerInput {
   /// (startMinute, endMinute) MYT wall clock during which non-essential audio
   /// (before/after recitation) is suppressed. Null = no suppression.
   final (int, int)? sleepWindow;
+
+  /// Daily zikr reminders and Islamic event notices.
+  final List<InfoNotice> notices;
+
+  /// Show a notification when before-prayer recitation starts.
+  final bool notifyBeforeRecitation;
 }
 
 class SchedulePlanner {
@@ -180,7 +213,7 @@ class SchedulePlanner {
               volume: cfg.beforeVolume,
               // Finish 5 s before the azan so they never overlap.
               maxDurationMs: cfg.beforeMinutes * 60000 - 5000,
-              notify: false,
+              notify: input.notifyBeforeRecitation,
               estimated: estimated,
             ));
           }
@@ -243,6 +276,29 @@ class SchedulePlanner {
             ));
           }
         }
+      }
+    }
+    // Notification-only notices (daily zikr, Islamic events). Planned for
+    // every day covered by the timetable horizon, verified or not, because
+    // they do not depend on prayer times.
+    for (final d in sortedDays) {
+      final wall = Myt.parseDateKey(d.date);
+      for (final n in input.notices) {
+        if (n.dateKey != null && n.dateKey != d.date) continue;
+        final at = Myt.instantFromWall(wall.year, wall.month, wall.day, n.minuteOfDay ~/ 60, n.minuteOfDay % 60);
+        if (!at.isAfter(input.now)) continue;
+        if (n.nonEssential && inSleep(at)) continue;
+        final id = '${d.date}_info_${n.key}';
+        out[id] = ScheduledEvent(
+          id: id,
+          triggerAt: at,
+          kind: ScheduledKind.info,
+          prayer: Prayer.subuh, // not prayer-related; field required by schema
+          title: n.title,
+          body: n.body,
+          notifySound: true,
+          graceMs: 60 * 60 * 1000,
+        );
       }
     }
     final list = out.values.toList()..sort((a, b) => a.triggerAt.compareTo(b.triggerAt));

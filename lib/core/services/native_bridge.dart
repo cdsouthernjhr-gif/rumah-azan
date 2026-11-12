@@ -146,6 +146,12 @@ class NativeBridge {
   Future<void> setVolume(double v) => _call('setVolume', {'volume': v});
   Future<void> setRepeatMode(String mode) => _call('setRepeatMode', {'mode': mode});
   Future<void> setShuffle(bool on) => _call('setShuffle', {'on': on});
+  /// Duration of a local audio file in ms (null if unknown/unavailable).
+  Future<int?> audioDuration(String path) async {
+    final r = await _call<Object?>('audioDuration', {'path': path});
+    return r is num ? r.toInt() : null;
+  }
+
   Future<PlayerState> playerState() async {
     final m = await _call<Map<Object?, Object?>>('playerState');
     return m == null ? const PlayerState() : PlayerState.fromMap(m);

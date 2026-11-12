@@ -92,7 +92,7 @@ stored and is not used for alarms unless the user allows it.
 
 ## G. Audio scheduling strategy
 
-1. **Plan (Dart, pure):** `SchedulePlanner` turns the next 7 days of verified
+1. **Plan (Dart, pure):** `SchedulePlanner` turns the next 30 days of verified
    timetable plus the per-prayer config into events (`reminder`, `before`,
    `azan`, `after`), with deterministic ids `yyyy-MM-dd_<prayer>_<kind>`.
    - Before-recitation stops 5 s before the azan (`maxDurationMs`).
@@ -102,6 +102,8 @@ stored and is not used for alarms unless the user allows it.
    - The sleep window suppresses before/after recitation, never the azan.
    - Automatic audio off → azan becomes a notification with sound.
    - No azan file → the default notification sound is used (never silent failure).
+   - `info` events: daily morning/evening zikr reminders and Islamic event
+     notices (calculated dates flagged), notification only.
 2. **Store & arm (Kotlin):** `Scheduler.sync` replaces the stored list
    (idempotent, de-duplicated) and arms **one** alarm for the earliest pending
    event.

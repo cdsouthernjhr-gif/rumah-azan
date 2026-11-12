@@ -74,7 +74,13 @@ object Notifications {
             .setContentText(overrideBody ?: e.optString("body"))
             .setContentIntent(contentIntent(ctx))
             .setAutoCancel(true)
-            .setCategory(if (e.optString("kind") == "reminder") Notification.CATEGORY_REMINDER else Notification.CATEGORY_ALARM)
+            .setCategory(
+                when (e.optString("kind")) {
+                    "azan", "test" -> Notification.CATEGORY_ALARM
+                    "before", "after" -> Notification.CATEGORY_STATUS
+                    else -> Notification.CATEGORY_REMINDER
+                },
+            )
         if (Build.VERSION.SDK_INT < 26) {
             var defaults = 0
             if (sound) defaults = defaults or Notification.DEFAULT_SOUND

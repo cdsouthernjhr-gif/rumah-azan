@@ -48,6 +48,18 @@ class AppSettings {
     'sleepEnd': '05:00',
     'sleepDim': 0.6, // overlay dimming 0..0.9 (app-level only)
     'sleepMuteNonEssential': true,
+    // Extra notifications
+    'zikrMorningReminder': false,
+    'zikrMorningTime': '07:00',
+    'zikrEveningReminder': false,
+    'zikrEveningTime': '17:30',
+    'eventReminder': true,
+    'eventReminderTime': '08:00',
+    'notifyBeforeRecitation': false,
+    // Wallpaper framing ("crop"): zoom ≥ 1 and focal point −1..1
+    'wpZoom': 1.0,
+    'wpAlignX': 0.0,
+    'wpAlignY': 0.0,
     // Housekeeping
     'lastSyncAt': null,
     'onboardingDone': false,
@@ -113,6 +125,18 @@ class AppSettings {
   String get sleepEnd => _get<String>('sleepEnd');
   double get sleepDim => _num('sleepDim').clamp(0.0, 0.9);
   bool get sleepMuteNonEssential => _get<bool>('sleepMuteNonEssential');
+
+  bool get zikrMorningReminder => _get<bool>('zikrMorningReminder');
+  String get zikrMorningTime => _get<String>('zikrMorningTime');
+  bool get zikrEveningReminder => _get<bool>('zikrEveningReminder');
+  String get zikrEveningTime => _get<String>('zikrEveningTime');
+  bool get eventReminder => _get<bool>('eventReminder');
+  String get eventReminderTime => _get<String>('eventReminderTime');
+  bool get notifyBeforeRecitation => _get<bool>('notifyBeforeRecitation');
+
+  double get wpZoom => _num('wpZoom').clamp(1.0, 3.0);
+  double get wpAlignX => _num('wpAlignX').clamp(-1.0, 1.0);
+  double get wpAlignY => _num('wpAlignY').clamp(-1.0, 1.0);
 
   DateTime? get lastSyncAt {
     final v = raw['lastSyncAt'];
