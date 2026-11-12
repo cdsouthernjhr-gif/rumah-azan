@@ -232,5 +232,9 @@ const Map<String, String> stringsMs = {
   'status_interrupted': 'Dipintas', 'status_stopped': 'Dihentikan', 'status_focus_lost': 'Fokus audio hilang',
   'frame_image': 'Bingkai imej (zum & kedudukan)', 'zoom': 'Zum', 'position_x': 'Kedudukan mendatar',
   'position_y': 'Kedudukan menegak', 'reset': 'Set semula',
+  'start_in_display': 'Buka terus ke Mod Paparan',
+  'start_in_display_sub': 'Sesuai untuk TV Box atau tablet dinding.',
+  'orientation': 'Orientasi skrin', 'orientation_auto': 'Automatik', 'orientation_portrait': 'Potret',
+  'orientation_landscape': 'Landskap', 'last_background_sync': 'Segerak latar belakang terakhir',
   'log': 'Log', 'clear_log': 'Kosongkan log',
 };

@@ -8,7 +8,7 @@ device, no access to the JAKIM host.
 | Command | Result |
 |---|---|
 | `flutter analyze` | **No issues found** |
-| `flutter test` | **66 tests passed, 0 failed** |
+| `flutter test` | **70 tests passed, 0 failed** |
 | Kotlin type-check (kotlinc 2.4.20 vs Android framework + Flutter embedding) | **0 errors**; all 15 classes compiled |
 | `flutter build apk --debug` | **Not possible**: "No Android SDK found" (SDK download host blocked) |
 
@@ -43,11 +43,15 @@ device, no access to the JAKIM host.
   onboarding with Kluang/JHR03 pre-selected; dashboard times, next prayer and
   countdown; no-data warning with no invented times; estimate label; English;
   scheduled Sleep Mode with Subuh countdown; TV Display mode at 1280×720;
-  tasbih counting.
+  tasbih counting; "start in Display Mode" on a portrait phone; TV remote:
+  D-pad (Tab) traversal reaches a quick-access tile and Select opens it.
+- **Background sync (headless, no widgets):** skipped before onboarding;
+  re-plans the full 30-day horizon from cached data.
 
 Bugs found and fixed by these tests: the player event stream subscribed
 without a native layer; overflows at phone width (next-prayer name in English,
-tasbih target chips).
+tasbih target chips); Display Mode overflowing in portrait; an invisible
+full-page focus node (idle timer wrapper) that trapped the TV remote.
 
 ## NOT executed: required on-device matrix
 
@@ -73,6 +77,7 @@ box (Android 9–11), and record the results here.
 | TV remote | All screens reachable with the D-pad; Display mode readable at 3 m. |
 | Low-RAM TV box | Wallpaper slideshow and custom images do not cause OOM. |
 | Test alarm (Diagnostics) | Notification after 15 s with the app closed. |
+| Background refresh (app not opened for 2+ days, online) | *Diagnostics → Last background sync* updates; log shows "Segerak latar belakang". Force it with `adb shell cmd jobscheduler run -f com.rumahazan.app 7301`. |
 
 ## Known limitations
 

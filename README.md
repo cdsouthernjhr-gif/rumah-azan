@@ -41,7 +41,7 @@ Package: `com.rumahazan.app` · Flutter 3.50 · Android 7.0 (API 24) dan ke atas
 - **Mod Paparan (Smart Mosque/Home Display):** jam besar, tarikh, zon, kiraan
   detik besar, jadual penuh, panel pengumuman, tayangan slaid, penyelamat
   skrin, kawalan alat kawalan jauh TV, skrin kekal hidup *pilihan pengguna*,
-  kembali automatik.
+  kembali automatik, buka terus ke Mod Paparan, kunci orientasi skrin.
 - **Mod Tidur:** manual atau berjadual; gelap, Subuh seterusnya, kecerahan
   tetingkap aplikasi sahaja, senyapkan audio tidak penting.
 - **Kiblat** (GPS/zon, kompas dengan pampasan kecondongan, ketepatan, kaedah
@@ -111,10 +111,11 @@ ditolak; aplikasi beralih ke penggera tidak tepat dan memaparkannya),
   differ by ±1 day from official announcements until an official date is entered.
 - Zone coordinates are approximate (GPS suggestion and estimate only).
 - Image "crop" is zoom + focal-point framing (non-destructive), not a free-form crop tool.
-- The timetable is refreshed when the app opens; there is no background
-  network job. Alarms are planned 30 days ahead, so the schedule only runs
-  out if the app is not opened for about a month (a notification warns 24 h
-  ahead).
+- Background refresh uses JobScheduler (daily, when a network is available)
+  and a headless Flutter engine. Android decides the exact run time and may
+  defer it under battery restrictions. Alarms are planned 30 days ahead, so
+  even without background runs the schedule lasts about a month (a
+  notification warns 24 h before it runs out).
 
 ## English summary
 

@@ -10,7 +10,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
-import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Build
 import android.os.PowerManager
@@ -41,6 +40,7 @@ class MainActivity : FlutterActivity() {
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
         Notifications.ensureChannels(this)
+        BackgroundSyncJob.ensureScheduled(this)
         val messenger = flutterEngine.dartExecutor.binaryMessenger
         MethodChannel(messenger, CHANNEL).setMethodCallHandler { call, result ->
             try {
@@ -69,41 +69,9 @@ class MainActivity : FlutterActivity() {
     }
 
     private fun handle(call: MethodCall, result: MethodChannel.Result) {
+        // Scheduler/data methods are shared with the background sync engine.
+        if (SharedChannel.handle(this, call, result)) return
         when (call.method) {
-            "ping" -> result.success(true)
-
-            // ---- Scheduler ----
-            "syncSchedule" -> {
-                val events = JSONArray()
-                (call.argument<List<Map<String, Any?>>>("events") ?: emptyList()).forEach { events.put(JSONObject(it)) }
-                val options = JSONObject(call.argument<Map<String, Any?>>("options") ?: emptyMap<String, Any?>())
-                result.success(Scheduler.sync(this, events, options))
-            }
-            "cancelSchedule" -> {
-                Scheduler.cancelAll(this)
-                result.success(null)
-            }
-            "schedulerStatus" -> result.success(Scheduler.status(this))
-            "scheduleTestEvent" -> {
-                val secs = call.argument<Int>("seconds") ?: 15
-                val now = System.currentTimeMillis()
-                Scheduler.addEvent(this, JSONObject().apply {
-                    put("id", "test_$now")
-                    put("triggerAtMs", now + secs * 1000L)
-                    put("kind", "test")
-                    put("title", call.argument<String>("title") ?: "Rumah Azan")
-                    put("body", call.argument<String>("body") ?: "")
-                    put("items", JSONArray())
-                    put("notify", true)
-                    put("notifySound", true)
-                    put("vibrate", true)
-                    put("graceMs", 60_000)
-                    put("priority", 1)
-                })
-                result.success(true)
-            }
-            "drainPlaybackHistory" -> result.success(Scheduler.drainHistory(this))
-
             // ---- System / permissions ----
             "diagnostics" -> result.success(diagnostics())
             "requestNotificationPermission" -> requestNotificationPermission(result)
@@ -171,28 +139,7 @@ class MainActivity : FlutterActivity() {
             "setRepeatMode" -> cmd(PlaybackService.ACTION_REPEAT, result) { it.putExtra("mode", call.argument<String>("mode") ?: "off") }
             "setShuffle" -> cmd(PlaybackService.ACTION_SHUFFLE, result) { it.putExtra("on", call.argument<Boolean>("on") ?: false) }
             "playerState" -> result.success(PlaybackService.state)
-            "audioDuration" -> {
-                // Off the main thread: metadata extraction touches the file.
-                val path = call.argument<String>("path") ?: ""
-                Thread {
-                    val ms = readDurationMs(path)
-                    runOnUiThread { result.success(ms) }
-                }.start()
-            }
-
             else -> result.notImplemented()
-        }
-    }
-
-    private fun readDurationMs(path: String): Long? {
-        val r = MediaMetadataRetriever()
-        return try {
-            r.setDataSource(path)
-            r.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLongOrNull()
-        } catch (_: Exception) {
-            null
-        } finally {
-            try { r.release() } catch (_: Exception) {}
         }
     }
 

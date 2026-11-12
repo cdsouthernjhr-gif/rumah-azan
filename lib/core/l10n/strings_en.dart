@@ -206,5 +206,9 @@ const Map<String, String> stringsEn = {
   'status_interrupted': 'Interrupted', 'status_stopped': 'Stopped', 'status_focus_lost': 'Audio focus lost',
   'frame_image': 'Image framing (zoom & position)', 'zoom': 'Zoom', 'position_x': 'Horizontal position',
   'position_y': 'Vertical position', 'reset': 'Reset',
+  'start_in_display': 'Open directly in Display Mode',
+  'start_in_display_sub': 'Suitable for TV boxes or wall tablets.',
+  'orientation': 'Screen orientation', 'orientation_auto': 'Automatic', 'orientation_portrait': 'Portrait',
+  'orientation_landscape': 'Landscape', 'last_background_sync': 'Last background sync',
   'log': 'Log', 'clear_log': 'Clear log',
 };

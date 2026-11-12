@@ -19,12 +19,30 @@ class RumahAzanApp extends ConsumerStatefulWidget {
   ConsumerState<RumahAzanApp> createState() => _RumahAzanAppState();
 }
 
+/// Maps the orientation setting to preferred orientations (empty = auto).
+List<DeviceOrientation> orientationsFor(String setting) => switch (setting) {
+      'portrait' => const [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown],
+      'landscape' => const [DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight],
+      _ => const [],
+    };
+
 class _RumahAzanAppState extends ConsumerState<RumahAzanApp> with WidgetsBindingObserver {
+  final _navigatorKey = GlobalKey<NavigatorState>();
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    WidgetsBinding.instance.addPostFrameCallback((_) => ref.read(appControllerProvider).onResume());
+    final s = ref.read(settingsProvider);
+    SystemChrome.setPreferredOrientations(orientationsFor(s.orientation));
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(appControllerProvider).onResume();
+      // TV box / wall tablet: open straight into the full-screen display.
+      final now = ref.read(settingsProvider);
+      if (now.startInDisplayMode && now.onboardingDone && now.zoneCode != null && !ref.read(sleepActiveProvider)) {
+        _navigatorKey.currentState?.push(MaterialPageRoute(builder: (_) => const DisplayModeScreen()));
+      }
+    });
   }
 
   @override
@@ -50,6 +68,10 @@ class _RumahAzanAppState extends ConsumerState<RumahAzanApp> with WidgetsBinding
     final slotTheme = s.autoThemeFromSlot ? themeForSlot(ref.watch(activeSlotProvider)) : s.theme;
     final palette = sleeping ? AppPalette.sleep : AppPalette.of(slotTheme);
 
+    ref.listen(settingsProvider.select((s) => s.orientation), (_, next) {
+      SystemChrome.setPreferredOrientations(orientationsFor(next));
+    });
+
     // Re-plan alarms when the date rolls over (keeps the planning horizon full).
     ref.listen(todayKeyProvider, (prev, next) {
       if (prev != null && prev != next) ref.read(appControllerProvider).resyncSchedule();
@@ -58,6 +80,7 @@ class _RumahAzanAppState extends ConsumerState<RumahAzanApp> with WidgetsBinding
     return L10nScope(
       l10n: L10n(s.language),
       child: MaterialApp(
+        navigatorKey: _navigatorKey,
         title: 'Rumah Azan',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.build(palette),

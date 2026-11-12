@@ -205,6 +205,23 @@ class SettingsScreen extends ConsumerWidget {
           onTap: () => push(context, const DisplayModeScreen()),
         ),
         SwitchListTile(
+          title: Text(context.tr('start_in_display')),
+          subtitle: Text(context.tr('start_in_display_sub')),
+          value: s.startInDisplayMode,
+          onChanged: (v) => n.update({'startInDisplayMode': v}),
+        ),
+        ListTile(
+          title: Text(context.tr('orientation')),
+          trailing: DropdownButton<String>(
+            value: s.orientation,
+            items: [
+              for (final o in const ['auto', 'portrait', 'landscape'])
+                DropdownMenuItem(value: o, child: Text(context.tr('orientation_$o'))),
+            ],
+            onChanged: (v) => n.update({'orientation': v}),
+          ),
+        ),
+        SwitchListTile(
           title: Text(context.tr('keep_screen_on')),
           subtitle: Text(context.tr('keep_screen_on_sub')),
           value: s.keepScreenOn,

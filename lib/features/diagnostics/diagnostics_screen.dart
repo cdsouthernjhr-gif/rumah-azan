@@ -153,6 +153,7 @@ class _DiagnosticsScreenState extends ConsumerState<DiagnosticsScreen> {
               kv(context.tr('alarm_mode'), '${sch['alarmMode'] ?? '-'}'),
               kv(context.tr('background_service'), d['playbackActive'] == true ? context.tr('running') : context.tr('idle')),
               kv(context.tr('last_alarm_fired'), _time(sch['lastFiredAtMs'])),
+              kv(context.tr('last_background_sync'), _time(sch['lastBackgroundSyncAtMs'])),
               kv(context.tr('last_playback'), '${sch['lastPlaybackTitle'] ?? '-'}\n${_time(sch['lastPlaybackAtMs'])}'),
               kv(context.tr('last_playback_error'), '${sch['lastError'] ?? '-'}\n${_time(sch['lastErrorAtMs'])}',
                   ok: sch['lastError'] == null ? true : false),

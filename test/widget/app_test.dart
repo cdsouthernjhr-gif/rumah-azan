@@ -1,4 +1,5 @@
 import 'package:drift/drift.dart' show DatabaseConnection;
+import 'package:flutter/services.dart';
 import 'package:drift/native.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -24,10 +25,11 @@ Future<AppDatabase> boot(
   bool seedData = true,
   DateTime? now,
   Widget? home,
+  Size size = const Size(1080 / 2.5, 2200 / 2.5),
 }) async {
   final clock = now ?? myt('2026-11-12', '15:25');
   Myt.clock = () => clock;
-  await tester.binding.setSurfaceSize(const Size(1080 / 2.5, 2200 / 2.5));
+  await tester.binding.setSurfaceSize(size);
   final db = AppDatabase(DatabaseConnection(NativeDatabase.memory(), closeStreamsSynchronously: true));
   final repo = PrayerRepository(db, DiagnosticsRepository(db));
   await tester.runAsync(() async {
@@ -126,9 +128,7 @@ void main() {
   });
 
   testWidgets('display (TV) mode renders clock, countdown and timetable', (tester) async {
-    await tester.binding.setSurfaceSize(const Size(1280, 720));
-    final db = await boot(tester, settings: configured, home: null);
-    await tester.binding.setSurfaceSize(const Size(1280, 720));
+    final db = await boot(tester, settings: configured, size: const Size(1280, 720));
     final nav = tester.state<NavigatorState>(find.byType(Navigator).first);
     nav.push(MaterialPageRoute(builder: (_) => const DisplayModeScreen()));
     await settle(tester);
@@ -149,4 +149,43 @@ void main() {
     expect(find.text('2'), findsOneWidget);
     await teardown(tester, db);
   });
+
+  testWidgets('"start in Display Mode" opens the full-screen display', (tester) async {
+    final db = await boot(tester, settings: configured.copyWith({'startInDisplayMode': true}));
+    // Phone portrait: Display Mode must fit without overflow.
+    expect(find.byType(DisplayModeScreen), findsOneWidget);
+    await teardown(tester, db);
+  });
+
+  testWidgets('TV remote: D-pad focus reaches a quick-access tile and Select opens it', (tester) async {
+    final db = await boot(tester, settings: configured, size: const Size(1280, 720));
+    bool focusedOn(String label) {
+      final node = FocusManager.instance.primaryFocus;
+      // A scope (whole page) is not a focused control.
+      if (node == null || node is FocusScopeNode) return false;
+      final ctx = node.context;
+      if (ctx == null) return false;
+      var found = false;
+      void visit(Element e) {
+        final w = e.widget;
+        if (w is Text && w.data == label) found = true;
+        if (!found) e.visitChildren(visit);
+      }
+      (ctx as Element).visitChildren(visit);
+      return found;
+    }
+
+    var steps = 0;
+    while (!focusedOn('Tasbih') && steps < 80) {
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab); // remote "next" focus
+      await tester.pump();
+      steps++;
+    }
+    expect(focusedOn('Tasbih'), isTrue, reason: 'tile must be focusable by remote');
+    await tester.sendKeyEvent(LogicalKeyboardKey.select); // D-pad centre
+    await settle(tester);
+    expect(find.byType(TasbihScreen), findsOneWidget);
+    await teardown(tester, db);
+  });
 }
+

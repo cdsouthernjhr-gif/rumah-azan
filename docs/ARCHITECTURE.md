@@ -76,6 +76,7 @@ avoids two audio engines that could overlap, and keeps background work minimal.
 | TV | `LEANBACK_LAUNCHER`, banner, `touchscreen required=false`, D-pad `select`/`enter` → `ActivateIntent`. |
 | Screen on | `FLAG_KEEP_SCREEN_ON`, only in Display/Sleep mode and only if the user enabled it. |
 | Sleep dimming | `WindowManager.LayoutParams.screenBrightness` (this window only, no `WRITE_SETTINGS`). |
+| Background refresh | `BackgroundSyncJob` (JobScheduler, daily, network required, persisted) starts a headless `FlutterEngine` running `backgroundSyncMain`, which reuses `AppController` (refresh-if-needed and re-plan). Scheduler methods are shared via `SharedChannel`. The UI and background isolates share one SQLite connection (`shareAcrossIsolates`). |
 | Battery optimisation | Opens the system list (`ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS`); the restricted `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS` permission is not requested. |
 
 ## E. Database design
@@ -114,7 +115,10 @@ stored and is not used for alarms unless the user allows it.
 4. **Play:** `PlaybackService` runs one session at a time. A higher priority
    (azan) interrupts; equal/lower priority is queued, so audio never overlaps.
 5. **Re-plan** on start-up, resume, date rollover, zone/provider/config
-   change, language change and restore.
+   change, language change, restore, and the daily background job.
+6. **Stale queue protection:** a queued scheduled session that waited more
+   than 10 min (or past its window) is skipped and recorded; a late start
+   keeps its original end boundary.
 
 ## H. UI/UX plan
 

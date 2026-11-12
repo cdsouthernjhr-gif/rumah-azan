@@ -38,6 +38,8 @@ class AppSettings {
     'wpFit': 'cover', // cover | contain
     // Display mode
     'keepScreenOn': false,
+    'orientation': 'auto', // auto | portrait | landscape
+    'startInDisplayMode': false,
     'displayAutoReturnMin': 0, // 0 = off
     'screensaverMin': 0, // 0 = off
     'slideshow': false,
@@ -115,6 +117,8 @@ class AppSettings {
   String get wpFit => _get<String>('wpFit');
 
   bool get keepScreenOn => _get<bool>('keepScreenOn');
+  String get orientation => _get<String>('orientation');
+  bool get startInDisplayMode => _get<bool>('startInDisplayMode');
   int get displayAutoReturnMin => _int('displayAutoReturnMin');
   int get screensaverMin => _int('screensaverMin');
   bool get slideshow => _get<bool>('slideshow');

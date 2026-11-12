@@ -142,66 +142,86 @@ class _DisplayLayout extends ConsumerWidget {
             shadows: const [Shadow(blurRadius: 8, color: Colors.black54)],
           );
 
+      final portrait = c.maxWidth < c.maxHeight;
+      final clock = Text(
+        '${w.hour.toString().padLeft(2, '0')}:${w.minute.toString().padLeft(2, '0')}'
+        ':${w.second.toString().padLeft(2, '0')}',
+        style: t(72, FontWeight.w300),
+      );
+      final dateInfo = Column(
+        crossAxisAlignment: portrait ? CrossAxisAlignment.center : CrossAxisAlignment.start,
+        children: [
+          Text(formatGregorian(context, today), style: t(24, FontWeight.w600), textAlign: TextAlign.center),
+          if (hijri != null) Text(hijri.date.format(s.language), style: t(20)),
+          if (zone != null)
+            Text('${zone.code} · ${zone.areas}', style: t(16), maxLines: 1, overflow: TextOverflow.ellipsis),
+        ],
+      );
+
+      Widget tile(Prayer p) => Container(
+            margin: EdgeInsets.all(5 * scale),
+            padding: EdgeInsets.symmetric(vertical: 12 * scale, horizontal: 6 * scale),
+            decoration: BoxDecoration(
+              color: (st != null && !st.nextIsTomorrow && st.next == p)
+                  ? accent.withValues(alpha: 0.85)
+                  : Colors.black.withValues(alpha: 0.45),
+              borderRadius: BorderRadius.circular(16 * scale),
+            ),
+            // FittedBox keeps names/times on one line at any size or language.
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(prayerName(context, p), style: t(p == Prayer.syuruk ? 18 : 22, FontWeight.w600)),
+              ),
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(Myt.hhmm(win!.today!.timeOf(p)), style: t(p == Prayer.syuruk ? 26 : 34, FontWeight.w500)),
+              ),
+            ]),
+          );
+
       final main = Column(children: [
         // TOP: time, date, location
         Padding(
           padding: EdgeInsets.fromLTRB(24 * scale, 16 * scale, 56, 0),
-          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(
-              '${w.hour.toString().padLeft(2, '0')}:${w.minute.toString().padLeft(2, '0')}'
-              ':${w.second.toString().padLeft(2, '0')}',
-              style: t(72, FontWeight.w300),
-            ),
-            SizedBox(width: 24 * scale),
-            Expanded(
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(formatGregorian(context, today), style: t(24, FontWeight.w600)),
-                if (hijri != null) Text(hijri.date.format(s.language), style: t(20)),
-                if (zone != null) Text('${zone.code} · ${zone.areas}', style: t(16), maxLines: 1, overflow: TextOverflow.ellipsis),
-              ]),
-            ),
-          ]),
+          child: portrait
+              ? Column(children: [FittedBox(fit: BoxFit.scaleDown, child: clock), dateInfo])
+              : Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  clock,
+                  SizedBox(width: 24 * scale),
+                  Expanded(child: dateInfo),
+                ]),
         ),
-        // CENTER: next prayer + countdown
+        // CENTER: next prayer + countdown (scales down rather than overflow)
         Expanded(
           child: Center(
-            child: st == null
-                ? Text(context.tr('no_next_prayer'), style: t(28))
-                : Column(mainAxisSize: MainAxisSize.min, children: [
-                    Text('${context.tr('next_prayer')} · ${prayerName(context, st.next)} ${Myt.hhmm(st.nextTime)}',
-                        style: t(34, FontWeight.w600).copyWith(color: accent)),
-                    Text(Myt.countdown(st.remaining), style: t(120, FontWeight.w200)),
-                    if (win?.today != null && !win!.today!.source.isVerified)
-                      Text(context.tr('estimate_short'), style: t(16).copyWith(color: Colors.amberAccent)),
-                  ]),
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16 * scale),
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: st == null
+                    ? Text(context.tr('no_next_prayer'), style: t(28))
+                    : Column(mainAxisSize: MainAxisSize.min, children: [
+                        Text('${context.tr('next_prayer')} · ${prayerName(context, st.next)} ${Myt.hhmm(st.nextTime)}',
+                            style: t(34, FontWeight.w600).copyWith(color: accent)),
+                        Text(Myt.countdown(st.remaining), style: t(120, FontWeight.w200)),
+                        if (win?.today != null && !win!.today!.source.isVerified)
+                          Text(context.tr('estimate_short'), style: t(16).copyWith(color: Colors.amberAccent)),
+                      ]),
+              ),
+            ),
           ),
         ),
-        // BOTTOM: complete timetable
+        // BOTTOM: complete timetable — one row (landscape) or 3×2 (portrait)
         if (win?.today != null)
           Padding(
-            padding: EdgeInsets.all(16 * scale),
-            child: Row(children: [
-              for (final p in Prayer.values)
-                Expanded(
-                  child: Container(
-                    margin: EdgeInsets.symmetric(horizontal: 6 * scale),
-                    padding: EdgeInsets.symmetric(vertical: 14 * scale),
-                    decoration: BoxDecoration(
-                      color: (st != null && !st.nextIsTomorrow && st.next == p)
-                          ? accent.withValues(alpha: 0.85)
-                          : Colors.black.withValues(alpha: 0.45),
-                      borderRadius: BorderRadius.circular(16 * scale),
-                    ),
-                    child: Column(children: [
-                      FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Text(prayerName(context, p), style: t(p == Prayer.syuruk ? 18 : 22, FontWeight.w600)),
-                      ),
-                      Text(Myt.hhmm(win!.today!.timeOf(p)), style: t(p == Prayer.syuruk ? 26 : 34, FontWeight.w500)),
-                    ]),
-                  ),
-                ),
-            ]),
+            padding: EdgeInsets.all(12 * scale),
+            child: portrait
+                ? Column(children: [
+                    for (final row in [Prayer.values.sublist(0, 3), Prayer.values.sublist(3)])
+                      Row(children: [for (final p in row) Expanded(child: tile(p))]),
+                  ])
+                : Row(children: [for (final p in Prayer.values) Expanded(child: tile(p))]),
           ),
       ]);
 
@@ -301,7 +321,12 @@ class _IdleReturnToDisplayState extends ConsumerState<IdleReturnToDisplay> {
   @override
   Widget build(BuildContext context) {
     ref.listen(settingsProvider.select((s) => s.displayAutoReturnMin), (_, _) => _reset());
+    // Observes key events from focused descendants (they bubble up) without
+    // becoming a focus stop itself — otherwise a TV remote would land on an
+    // invisible full-page node.
     return Focus(
+      canRequestFocus: false,
+      skipTraversal: true,
       onKeyEvent: (_, _) {
         _reset();
         return KeyEventResult.ignored;

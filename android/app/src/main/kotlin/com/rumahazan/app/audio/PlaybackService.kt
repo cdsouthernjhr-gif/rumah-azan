@@ -48,7 +48,11 @@ class PlaybackService : Service(), AudioManager.OnAudioFocusChangeListener {
         val maxDurationMs: Long,
         var repeatsLeft: Int,        // scheduled: remaining playlist repeats
         val startIndex: Int = 0,
-    )
+        val createdAtElapsed: Long = SystemClock.elapsedRealtime(),
+    ) {
+        /** Time spent waiting in the queue before starting. */
+        fun waitedMs(): Long = SystemClock.elapsedRealtime() - createdAtElapsed
+    }
 
     companion object {
         const val ACTION_PLAY_SCHEDULED = "com.rumahazan.app.PLAY_SCHEDULED"
@@ -63,6 +67,9 @@ class PlaybackService : Service(), AudioManager.OnAudioFocusChangeListener {
         const val ACTION_REPEAT = "com.rumahazan.app.REPEAT"
         const val ACTION_SHUFFLE = "com.rumahazan.app.SHUFFLE"
         private const val NOTIF_ID = 4242
+
+        /** Queued scheduled audio older than this is dropped, not played late. */
+        private const val MAX_QUEUE_WAIT_MS = 10 * 60 * 1000L
 
         private val idle: Map<String, Any?> = mapOf("state" to "idle")
 
@@ -247,7 +254,9 @@ class PlaybackService : Service(), AudioManager.OnAudioFocusChangeListener {
         releasePlayer()
         session = s
         rebuildOrder(keepCurrent = false)
-        stopAtElapsed = if (s.maxDurationMs > 0) SystemClock.elapsedRealtime() + s.maxDurationMs else 0L
+        // A delayed session keeps its original end boundary (planner clips
+        // before/after recitation so it never runs into the next azan).
+        stopAtElapsed = if (s.maxDurationMs > 0) s.createdAtElapsed + s.maxDurationMs else 0L
         if (!requestFocus(s)) {
             Scheduler.setLastError(this, "Fokus audio ditolak (panggilan aktif?)")
             if (s.source == "scheduled") Scheduler.recordHistory(this, s.eventId, s.title, "skipped", "audio focus denied")
@@ -370,7 +379,11 @@ class PlaybackService : Service(), AudioManager.OnAudioFocusChangeListener {
     }
 
     private fun startNextPendingOrStop() {
-        val next = pending.removeFirstOrNull()
+        var next = pending.removeFirstOrNull()
+        while (next != null && isStale(next)) {
+            Scheduler.recordHistory(this, next.eventId, next.title, "skipped", "queued ${next.waitedMs() / 1000}s")
+            next = pending.removeFirstOrNull()
+        }
         if (next != null) {
             startSession(next)
         } else {
@@ -378,6 +391,12 @@ class PlaybackService : Service(), AudioManager.OnAudioFocusChangeListener {
             stopIfIdle()
         }
         emit()
+    }
+
+    private fun isStale(s: Session): Boolean {
+        if (s.source != "scheduled") return false
+        val waited = s.waitedMs()
+        return waited > MAX_QUEUE_WAIT_MS || (s.maxDurationMs > 0 && waited >= s.maxDurationMs - 5000)
     }
 
     private fun stopIfIdle() {

@@ -69,11 +69,11 @@ improvement / on-device verification.
 | Audio library (import, HTTPS download manager, playlists, durations, playback history) | E | No audio bundled (no licensed recordings available). Needs device test. |
 | Native audio engine (foreground service, focus, queue, priority) | E | Kotlin type-checks against the Android framework; **not run on a device**. |
 | Audio scheduler planner (before/at/after, overlap, duplicates, sleep) | A | Unit-tested. |
-| Native AlarmManager scheduler, boot/time/tz/update receivers | E | Kotlin type-checks; needs on-device verification (see the test matrix). |
+| Native AlarmManager scheduler, boot/time/tz/update receivers, daily background refresh (JobScheduler + headless engine) | E | Kotlin type-checks; needs on-device verification (see the test matrix). |
 | Notifications (channels, per-prayer, reminder, silent, DND, daily zikr, Islamic events, recitation start) | E | Planning unit-tested; posting implemented natively; needs device test. |
 | Wallpapers (9 procedural built-ins, import, framing zoom/position, brightness/overlay/blur, fit, time slots) | A/E | Framing is zoom + focal point, not a free-form crop. |
 | Themes (4) + automatic theme by time slot + font scale | A | |
-| Smart Display / TV mode (D-pad, screensaver, slideshow, keep-screen-on opt-in, auto-return) | A/E | Widget-tested at 1280×720; needs a real TV remote test. |
+| Smart Display / TV mode (D-pad, screensaver, slideshow, keep-screen-on opt-in, auto-return, start-in-display, orientation) | A/E | Widget-tested at 1280×720 and portrait phone; D-pad focus/Select tested; needs a real TV remote test. |
 | Sleep Mode (manual/scheduled, window brightness only, Subuh countdown) | A | Widget-tested. |
 | Qiblah (bearing, tilt-compensated compass, accuracy, manual fallback) | A/E | Maths unit-tested; sensor behaviour needs a device. |
 | Digital tasbih (targets, vibration, sound, history, 7-day stats, resume) | A | Widget-tested. |
