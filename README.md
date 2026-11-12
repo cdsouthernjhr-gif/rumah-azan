@@ -92,8 +92,8 @@ ditolak; aplikasi beralih ke penggera tidak tepat dan memaparkannya),
 
 ## Known limitations
 
-- **No APK was produced** in the development environment (no Android SDK; its
-  download host was blocked). Build on a workstation; see docs/BUILD.md.
+- The debug APK is built by GitHub Actions (*Actions → Bina APK →
+  rumah-azan-debug-apk*). No signed release APK yet (needs your keystore).
 - **Android 6.0 (API 23) is not supported:** Flutter 3.50 requires API 24+.
 - The **JAKIM endpoint was not reachable** from the development environment.
   The parser is tested against the documented shape and must be verified live.

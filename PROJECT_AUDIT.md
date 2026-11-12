@@ -82,7 +82,7 @@ improvement / on-device verification.
 | Database (15 tables, indexes, FKs, migration hook) | A | Unit-tested in-memory. |
 | Localisation (Bahasa Melayu primary, English) | A | Key parity unit-tested. |
 | Integration tests | B | Written (`integration_test/`), **not executed** (no device). |
-| Debug / release APK | C | **Not built**: no Android SDK in this environment. |
+| Debug / release APK | B | Debug APK **built successfully by GitHub Actions** (full Gradle build). Signed release APK not yet built (needs keystore). |
 
 ## 3. Integration strategy for future work
 

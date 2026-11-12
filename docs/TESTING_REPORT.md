@@ -10,7 +10,8 @@ device, no access to the JAKIM host.
 | `flutter analyze` | **No issues found** |
 | `flutter test` | **70 tests passed, 0 failed** |
 | Kotlin type-check (kotlinc 2.4.20 vs Android framework + Flutter embedding) | **0 errors**; all 15 classes compiled |
-| `flutter build apk --debug` | **Not possible**: "No Android SDK found" (SDK download host blocked) |
+| `flutter build apk --debug` (local container) | Not possible: "No Android SDK found" (SDK download host blocked) |
+| GitHub Actions "Bina APK" (run #1, commit b2d8865) | **Success**: analyze, tests and a full Gradle debug build passed; artifact `rumah-azan-debug-apk` (≈ 97 MB zip) |
 
 ### What the automated tests cover (`test/`)
 

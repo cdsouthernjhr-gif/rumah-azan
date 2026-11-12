@@ -1,5 +1,12 @@
 # Installation & build
 
+## Easiest: let GitHub build it
+
+Every push runs `.github/workflows/build-apk.yml` (analyze → test → debug APK).
+Open the repository on GitHub → **Actions** → **Bina APK** → latest run →
+**Artifacts** → `rumah-azan-debug-apk`. Unzip it to get `app-debug.apk`.
+You can also start it manually with **Run workflow**.
+
 ## Requirements
 
 - Flutter **3.50.x** stable (Dart 3.14). Check with `flutter --version`.
