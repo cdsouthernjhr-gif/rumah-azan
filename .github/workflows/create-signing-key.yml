@@ -1,0 +1,66 @@
+name: Cipta Kunci Tandatangan
+
+# Run ONCE (Actions → Cipta Kunci Tandatangan → Run workflow).
+#
+# Creates the permanent Android signing key and stores it directly in this
+# repository's encrypted secrets. The key and passwords are never printed,
+# uploaded or committed (this repository is public).
+#
+# Prerequisite: a fine-grained personal access token limited to this
+# repository with "Secrets: Read and write", saved as the repository secret
+# RA_ADMIN_TOKEN. Delete that token after this workflow succeeds.
+#
+# Safety: refuses to run if a key already exists, because replacing the key
+# would make every installed copy un-updatable (users would have to uninstall).
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Taip YA untuk mencipta kunci tandatangan tetap'
+        required: true
+
+jobs:
+  create:
+    runs-on: ubuntu-latest
+    env:
+      EXISTING_KEY: ${{ secrets.RA_KEYSTORE_B64 }}
+      GH_TOKEN: ${{ secrets.RA_ADMIN_TOKEN }}
+    steps:
+      - name: Checks
+        run: |
+          if [ "${{ github.event.inputs.confirm }}" != "YA" ]; then
+            echo "::error::Taip YA dalam kotak pengesahan."; exit 1
+          fi
+          if [ -n "$EXISTING_KEY" ]; then
+            echo "::error::Kunci sudah wujud (RA_KEYSTORE_B64). Tidak ditukar supaya kemas kini aplikasi terus berfungsi."; exit 1
+          fi
+          if [ -z "$GH_TOKEN" ]; then
+            echo "::error::Secret RA_ADMIN_TOKEN tiada. Lihat docs/UPDATES.md langkah 1."; exit 1
+          fi
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Generate key and store it in repository secrets
+        run: |
+          set -euo pipefail
+          umask 077
+          WORK="$(mktemp -d)"
+          PASS="$(openssl rand -base64 32 | tr -d '/+=' | cut -c1-32)"
+          echo "::add-mask::$PASS"
+          keytool -genkeypair -v -noprompt \
+            -keystore "$WORK/upload.jks" -storetype PKCS12 \
+            -alias rumahazan -keyalg RSA -keysize 4096 -validity 10000 \
+            -storepass "$PASS" -keypass "$PASS" \
+            -dname "CN=Rumah Azan, O=Rumah Azan, C=MY" > /dev/null 2>&1
+          base64 -w0 "$WORK/upload.jks" > "$WORK/upload.b64"
+          gh secret set RA_KEYSTORE_B64 --repo "$GITHUB_REPOSITORY" < "$WORK/upload.b64"
+          printf '%s' "$PASS" | gh secret set RA_KEYSTORE_PASSWORD --repo "$GITHUB_REPOSITORY"
+          printf '%s' "$PASS" | gh secret set RA_KEY_PASSWORD --repo "$GITHUB_REPOSITORY"
+          printf '%s' "rumahazan" | gh secret set RA_KEY_ALIAS --repo "$GITHUB_REPOSITORY"
+          # Public certificate fingerprint only (safe to show).
+          keytool -list -v -keystore "$WORK/upload.jks" -storepass "$PASS" | grep -E "SHA256:" | head -1
+          rm -rf "$WORK"
+          echo "Kunci tetap disimpan dalam Secrets. Padam token RA_ADMIN_TOKEN sekarang, kemudian jalankan 'Bina APK'."

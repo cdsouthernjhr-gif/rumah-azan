@@ -2,10 +2,13 @@
 
 ## Easiest: let GitHub build it
 
-Every push runs `.github/workflows/build-apk.yml` (analyze → test → debug APK).
-Open the repository on GitHub → **Actions** → **Bina APK** → latest run →
-**Artifacts** → `rumah-azan-debug-apk`. Unzip it to get `app-debug.apk`.
-You can also start it manually with **Run workflow**.
+Every push runs `.github/workflows/build-apk.yml`: analyze → test → APK →
+launch on an Android 14 emulator → (if the permanent signing key exists)
+publish a GitHub Release. The APK is the artifact `rumah-azan-apk` and, for
+signed builds, `rumah-azan.apk` under **Releases**.
+
+To install new versions **as updates without uninstalling**, create the
+permanent signing key once: see [UPDATES.md](UPDATES.md).
 
 ## Requirements
 

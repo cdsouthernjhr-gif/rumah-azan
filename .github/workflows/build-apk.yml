@@ -1,7 +1,14 @@
 name: Bina APK
 
-# Builds the debug APK on GitHub's servers (they have the Android SDK) and
-# attaches it to the run as a downloadable artifact.
+# Builds the APK on GitHub's servers (they have the Android SDK), launches it
+# on an Android 14 emulator, and — when the permanent signing key exists in
+# repository secrets — publishes it as a GitHub Release.
+#
+# Updating without reinstalling needs (1) the SAME signing key every build and
+# (2) a versionCode that always increases. (1) comes from the RA_* secrets
+# (created once by the "Cipta Kunci Tandatangan" workflow); (2) is the run
+# number. Without the secrets a debug APK is built (random key per build →
+# must uninstall before installing).
 on:
   push:
     branches: ["**"]
@@ -11,6 +18,13 @@ jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    outputs:
+      signed: ${{ steps.sign.outputs.signed }}
+    env:
+      RA_KEYSTORE_B64: ${{ secrets.RA_KEYSTORE_B64 }}
+      RA_KEYSTORE_PASSWORD: ${{ secrets.RA_KEYSTORE_PASSWORD }}
+      RA_KEY_ALIAS: ${{ secrets.RA_KEY_ALIAS }}
+      RA_KEY_PASSWORD: ${{ secrets.RA_KEY_PASSWORD }}
     steps:
       - uses: actions/checkout@v4
 
@@ -34,13 +48,46 @@ jobs:
       - name: Tests
         run: flutter test
 
-      - name: Build debug APK
-        run: flutter build apk --debug
+      - name: Prepare permanent signing key (from secrets)
+        id: sign
+        run: |
+          if [ -n "$RA_KEYSTORE_B64" ]; then
+            echo "$RA_KEYSTORE_B64" | base64 -d > android/app/upload-keystore.jks
+            {
+              echo "storeFile=upload-keystore.jks"
+              echo "storePassword=$RA_KEYSTORE_PASSWORD"
+              echo "keyAlias=$RA_KEY_ALIAS"
+              echo "keyPassword=$RA_KEY_PASSWORD"
+            } > android/key.properties
+            echo "signed=true" >> "$GITHUB_OUTPUT"
+            echo "Kunci tandatangan tetap ditemui: membina APK release."
+          else
+            echo "signed=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::Tiada kunci tandatangan tetap (secret RA_KEYSTORE_B64). APK debug dibina; pengguna perlu nyahpasang sebelum memasang versi baharu. Jalankan aliran kerja 'Cipta Kunci Tandatangan' sekali."
+          fi
+
+      - name: Build APK (versionCode = run number, always increasing)
+        run: |
+          mkdir -p dist
+          if [ "${{ steps.sign.outputs.signed }}" = "true" ]; then
+            flutter build apk --release --build-number=${{ github.run_number }}
+            cp build/app/outputs/flutter-apk/app-release.apk dist/rumah-azan.apk
+          else
+            flutter build apk --debug --build-number=${{ github.run_number }}
+            cp build/app/outputs/flutter-apk/app-debug.apk dist/rumah-azan.apk
+          fi
+          # Show which certificate signed the APK (public fingerprint only).
+          APKSIGNER="$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)/apksigner"
+          "$APKSIGNER" verify --print-certs dist/rumah-azan.apk | grep -E "SHA-256|DN" | head -3 || true
+
+      - name: Remove key material from the runner
+        if: always()
+        run: rm -f android/app/upload-keystore.jks android/key.properties
 
       - uses: actions/upload-artifact@v4
         with:
-          name: rumah-azan-debug-apk
-          path: build/app/outputs/flutter-apk/app-debug.apk
+          name: rumah-azan-apk
+          path: dist/rumah-azan.apk
           retention-days: 14
 
   smoke-test:
@@ -54,7 +101,7 @@ jobs:
 
       - uses: actions/download-artifact@v4
         with:
-          name: rumah-azan-debug-apk
+          name: rumah-azan-apk
           path: apk
 
       - name: Enable KVM
@@ -71,7 +118,7 @@ jobs:
           target: google_apis
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          script: bash tool/ci/smoke_test.sh apk/app-debug.apk
+          script: bash tool/ci/smoke_test.sh apk/rumah-azan.apk
 
       - uses: actions/upload-artifact@v4
         if: always()
@@ -79,3 +126,30 @@ jobs:
           name: smoke-test-logs
           path: smoke/
           retention-days: 14
+
+  publish:
+    # Only signed builds that passed the emulator test become a Release, so
+    # every published APK can be installed as an UPDATE over the previous one
+    # (and update apps such as Obtainium can track it).
+    needs: [build, smoke-test]
+    if: needs.build.outputs.signed == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: rumah-azan-apk
+          path: dist
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: build-${{ github.run_number }}
+          target_commitish: ${{ github.sha }}
+          name: Rumah Azan — binaan ${{ github.run_number }}
+          body: |
+            APK bertandatangan tetap (versionCode ${{ github.run_number }}).
+            Pasang terus di atas versi sebelumnya — tidak perlu nyahpasang.
+            Commit: ${{ github.sha }} · Cawangan: ${{ github.ref_name }}
+          files: dist/rumah-azan.apk
+          make_latest: true
