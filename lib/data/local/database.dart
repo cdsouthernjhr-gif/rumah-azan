@@ -202,18 +202,32 @@ class AppDatabase extends _$AppDatabase {
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
-        onCreate: (m) async => m.createAll(),
+        // Idempotent schema creation: the UI engine and the background-sync
+        // engine may open a NEW database file at the same moment, both see
+        // schema version 0 and both run onCreate. Tables already use
+        // IF NOT EXISTS; indexes are created with IF NOT EXISTS here too.
+        onCreate: (m) async {
+          for (final entity in allSchemaEntities) {
+            if (entity is Index) {
+              final sql = entity.createStatementsByDialect[SqlDialect.sqlite] ??
+                  entity.createStatementsByDialect.values.first;
+              await customStatement(sql.replaceFirstMapped(
+                RegExp(r'^CREATE (UNIQUE )?INDEX (?!IF NOT EXISTS)', caseSensitive: false),
+                (mm) => 'CREATE ${mm[1] ?? ''}INDEX IF NOT EXISTS ',
+              ));
+            } else {
+              await m.create(entity);
+            }
+          }
+        },
         onUpgrade: (m, from, to) async {
-          // Future migrations go here, e.g.:
+          // Future migrations go here (keep them idempotent — see onCreate), e.g.:
           // if (from < 2) await m.addColumn(audioLibrary, audioLibrary.someColumn);
         },
         beforeOpen: (details) async {
           await customStatement('PRAGMA foreign_keys = ON');
-          // Wait (instead of failing) if the background sync holds a lock.
-          await customStatement('PRAGMA busy_timeout = 5000');
-          // WAL lets a reader and a writer work at the same time. Returns a
-          // row, so use customSelect; ignored for in-memory databases.
-          await customSelect('PRAGMA journal_mode = WAL').get();
+          // busy_timeout / WAL are set per connection in
+          // configureSqliteConnection (before migrations run).
         },
       );
 }

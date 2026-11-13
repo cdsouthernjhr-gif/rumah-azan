@@ -28,6 +28,10 @@ import org.json.JSONObject
 class MainActivity : FlutterActivity() {
 
     companion object {
+        /** True while the UI activity exists (BackgroundSyncJob skips then). */
+        @Volatile
+        var isRunning = false
+
         private const val CHANNEL = "com.rumahazan.app/native"
         private const val EVENTS = "com.rumahazan.app/player_events"
         private const val REQ_NOTIF = 4101
@@ -38,6 +42,7 @@ class MainActivity : FlutterActivity() {
     private val playerListener: (Map<String, Any?>) -> Unit = { s -> runOnUiThread { sink?.success(s) } }
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
+        isRunning = true
         super.configureFlutterEngine(flutterEngine)
         Notifications.ensureChannels(this)
         BackgroundSyncJob.ensureScheduled(this)
@@ -64,6 +69,7 @@ class MainActivity : FlutterActivity() {
     }
 
     override fun onDestroy() {
+        isRunning = false
         PlaybackService.removeListener(playerListener)
         super.onDestroy()
     }

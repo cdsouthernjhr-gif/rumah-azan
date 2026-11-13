@@ -28,6 +28,8 @@ class BackgroundSyncJob : JobService() {
 
     companion object {
         private const val JOB_ID = 7301
+        private const val PERIOD_MS = 24 * 60 * 60 * 1000L
+        private const val FLEX_MS = 6 * 60 * 60 * 1000L
         private const val TIMEOUT_MS = 4 * 60 * 1000L
         private const val PREFS = "rumahazan_background"
 
@@ -39,9 +41,14 @@ class BackgroundSyncJob : JobService() {
         fun ensureScheduled(ctx: Context) {
             try {
                 val js = ctx.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
-                if (js.getPendingJob(JOB_ID) != null) return
+                val pending = js.getPendingJob(JOB_ID)
+                // Re-schedule jobs created by older builds (no flex window).
+                if (pending != null && pending.flexMillis == FLEX_MS) return
                 val info = JobInfo.Builder(JOB_ID, ComponentName(ctx, BackgroundSyncJob::class.java))
-                    .setPeriodic(24 * 60 * 60 * 1000L)
+                    // Flex window = last 6 h of each 24 h period, so the
+                    // first run is ~18 h after install, never right while
+                    // the app is opening for the first time.
+                    .setPeriodic(PERIOD_MS, FLEX_MS)
                     .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY) // needs ACCESS_NETWORK_STATE
                     .setPersisted(true) // survives reboot (RECEIVE_BOOT_COMPLETED)
                     .build()
@@ -61,6 +68,10 @@ class BackgroundSyncJob : JobService() {
 
     override fun onStartJob(params: JobParameters): Boolean {
         this.params = params
+        // The open app already refreshes and re-plans itself; running a
+        // second engine against the same database now would only compete
+        // for SQLite locks.
+        if (MainActivity.isRunning) return false
         return try {
             val loader = FlutterInjector.instance().flutterLoader()
             loader.startInitialization(applicationContext)

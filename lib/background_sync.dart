@@ -1,4 +1,5 @@
 import 'package:drift_flutter/drift_flutter.dart';
+import 'package:sqlite3/common.dart' show CommonDatabase;
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,12 +13,32 @@ import 'data/repositories/settings_repository.dart';
 
 /// Opens the app database.
 ///
-/// NOTE: `shareAcrossIsolates` is deliberately NOT used: if opening SQLite
-/// fails, drift_flutter's shared mode retries forever, which froze the app on
-/// its splash screen. Concurrent access from the UI and the background engine
-/// is instead handled by SQLite itself (WAL + busy_timeout, see
-/// AppDatabase.migration.beforeOpen).
-AppDatabase openAppDatabase() => AppDatabase(driftDatabase(name: 'rumah_azan'));
+/// The UI engine and the headless background engine (BackgroundSyncJob) are
+/// separate Flutter engines, so they use separate SQLite connections to the
+/// same file. `setup` runs right after the connection opens — BEFORE drift
+/// creates/migrates tables — so a connection that finds the file busy waits
+/// (busy_timeout) instead of failing with "database is locked".
+///
+/// `shareAcrossIsolates` is deliberately NOT used: it does not work across
+/// engines, and when opening fails it retries forever (frozen splash screen).
+AppDatabase openAppDatabase() => AppDatabase(driftDatabase(
+      name: 'rumah_azan',
+      native: DriftNativeOptions(setup: configureSqliteConnection),
+    ));
+
+/// Per-connection SQLite settings (also used by tests).
+void configureSqliteConnection(CommonDatabase db) {
+  db.execute('PRAGMA busy_timeout = 10000');
+  // WAL: a reader and a writer can work concurrently. Switching needs
+  // exclusive access, and SQLite answers "locked" immediately (no waiting)
+  // when another connection is active. WAL is persistent in the file, so it
+  // is enough that one connection succeeds; ignore failure here.
+  try {
+    db.select('PRAGMA journal_mode = WAL');
+  } on Object {
+    // Another connection is using the file; it will (or did) enable WAL.
+  }
+}
 
 /// Result of one background run (exposed for tests).
 class BackgroundSyncResult {

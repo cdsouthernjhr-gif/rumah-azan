@@ -36,11 +36,22 @@ Future<void> main() async {
   ));
 }
 
+/// Opens the database, retrying a few times if another connection (the
+/// background sync engine) briefly holds a lock.
 Future<(AppDatabase, AppSettings)> _openStorage() async {
-  final db = openAppDatabase();
-  final settings = await SettingsRepository(db).load();
-  await PrayerRepository(db, DiagnosticsRepository(db)).ensureZonesSeeded();
-  return (db, settings);
+  for (var attempt = 1;; attempt++) {
+    final db = openAppDatabase();
+    try {
+      final settings = await SettingsRepository(db).load();
+      await PrayerRepository(db, DiagnosticsRepository(db)).ensureZonesSeeded();
+      return (db, settings);
+    } catch (e) {
+      await db.close();
+      final busy = e.toString().contains('database is locked') || e.toString().contains('SQLITE_BUSY');
+      if (!busy || attempt >= 3) rethrow;
+      await Future<void>.delayed(Duration(seconds: 2 * attempt));
+    }
+  }
 }
 
 /// Headless entry point for the daily background refresh
