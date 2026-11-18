@@ -7,6 +7,7 @@ import 'core/services/app_controller.dart';
 import 'core/theme/app_theme.dart';
 import 'data/providers/providers.dart';
 import 'features/dashboard/dashboard_screen.dart';
+import 'features/incoming/incoming_files_screen.dart';
 import 'features/onboarding/onboarding_screen.dart';
 import 'features/sleep_mode/sleep_mode_screen.dart';
 import 'features/smart_display/display_mode_screen.dart';
@@ -35,14 +36,33 @@ class _RumahAzanAppState extends ConsumerState<RumahAzanApp> with WidgetsBinding
     WidgetsBinding.instance.addObserver(this);
     final s = ref.read(settingsProvider);
     SystemChrome.setPreferredOrientations(orientationsFor(s.orientation));
+    // Files shared from other apps ("Kongsi" / "Buka dengan").
+    ref.read(nativeBridgeProvider).listenIncomingFiles(_checkIncomingFiles);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(appControllerProvider).onResume();
+      _checkIncomingFiles();
       // TV box / wall tablet: open straight into the full-screen display.
       final now = ref.read(settingsProvider);
       if (now.startInDisplayMode && now.onboardingDone && now.zoneCode != null && !ref.read(sleepActiveProvider)) {
         _navigatorKey.currentState?.push(MaterialPageRoute(builder: (_) => const DisplayModeScreen()));
       }
     });
+  }
+
+  bool _showingIncoming = false;
+
+  /// Takes shared files from the native side and asks the user what to do.
+  /// Before first-run setup is complete they stay pending (taken later).
+  Future<void> _checkIncomingFiles() async {
+    final s = ref.read(settingsProvider);
+    if (_showingIncoming || !s.onboardingDone || s.zoneCode == null) return;
+    final files = await ref.read(nativeBridgeProvider).takeIncomingFiles();
+    final nav = _navigatorKey.currentState;
+    if (files.isEmpty || nav == null) return;
+    _showingIncoming = true;
+    await nav.push(MaterialPageRoute(builder: (_) => IncomingFilesScreen(files: files)));
+    _showingIncoming = false;
+    _checkIncomingFiles(); // more may have arrived meanwhile
   }
 
   @override
@@ -56,6 +76,7 @@ class _RumahAzanAppState extends ConsumerState<RumahAzanApp> with WidgetsBinding
     // Application resume: re-import native history, refresh data if needed,
     // and recompute the schedule (handles date/time/zone changes meanwhile).
     if (state == AppLifecycleState.resumed) {
+      _checkIncomingFiles();
       ref.read(appControllerProvider).onResume();
       ref.invalidate(dayWindowProvider);
     }
@@ -67,6 +88,11 @@ class _RumahAzanAppState extends ConsumerState<RumahAzanApp> with WidgetsBinding
     final sleeping = ref.watch(sleepActiveProvider);
     final slotTheme = s.autoThemeFromSlot ? themeForSlot(ref.watch(activeSlotProvider)) : s.theme;
     final palette = sleeping ? AppPalette.sleep : AppPalette.of(slotTheme);
+
+    // Shares received during first-run setup are handled once it completes.
+    ref.listen(settingsProvider.select((s) => s.onboardingDone), (_, done) {
+      if (done) WidgetsBinding.instance.addPostFrameCallback((_) => _checkIncomingFiles());
+    });
 
     ref.listen(settingsProvider.select((s) => s.orientation), (_, next) {
       SystemChrome.setPreferredOrientations(orientationsFor(next));

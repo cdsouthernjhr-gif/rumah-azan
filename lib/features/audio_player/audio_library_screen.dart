@@ -71,6 +71,23 @@ class _AudioLibraryScreenState extends ConsumerState<AudioLibraryScreen> {
     ref.read(appControllerProvider).resyncSchedule();
   }
 
+  /// Replaces the file of [row] with one picked by the user. The item keeps
+  /// its id, so playlists and azan choices continue to point at it.
+  Future<void> _replace(AudioRow row) async {
+    final f = await FilePicker.pickFile(type: FileType.audio);
+    if (f == null || !mounted) return;
+    if (!await confirmDialog(context, context.tr('replace_file'), context.tr('replace_audio_q', {'t': row.title}))) return;
+    try {
+      await ref.read(audioRepoProvider).replaceFile(row.id, f.readAsByteStream(), f.name);
+      await _backfill();
+      // Paths are stored in the native alarm plan → re-plan now.
+      await ref.read(appControllerProvider).resyncSchedule();
+      if (mounted) showSnack(context, context.tr('replaced_ok'));
+    } catch (e) {
+      if (mounted) showSnack(context, '${context.tr('replace_failed')}: $e');
+    }
+  }
+
   Future<void> _downloadDialog() async {
     final url = await textInputDialog(context, context.tr('download_audio'), hint: 'https://…/audio.mp3');
     if (url == null || url.isEmpty || !mounted) return;
@@ -178,7 +195,9 @@ class _AudioLibraryScreenState extends ConsumerState<AudioLibraryScreen> {
                         onTap: () => _playList(filtered, i),
                         trailing: PopupMenuButton<String>(
                           onSelected: (v) async {
-                            if (v == 'rename') {
+                            if (v == 'replace') {
+                              await _replace(r);
+                            } else if (v == 'rename') {
                               final t = await textInputDialog(context, context.tr('rename'), initial: r.title);
                               if (t != null && t.isNotEmpty) await ref.read(audioRepoProvider).rename(r.id, t, r.category);
                             } else if (v == 'delete') {
@@ -189,6 +208,7 @@ class _AudioLibraryScreenState extends ConsumerState<AudioLibraryScreen> {
                             }
                           },
                           itemBuilder: (_) => [
+                            PopupMenuItem(value: 'replace', child: Text(context.tr('replace_file'))),
                             PopupMenuItem(value: 'rename', child: Text(context.tr('rename'))),
                             PopupMenuItem(value: 'delete', child: Text(context.tr('delete'))),
                           ],

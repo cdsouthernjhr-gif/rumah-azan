@@ -50,4 +50,23 @@ if [ -z "$PID2" ]; then echo "::error::Scenario 2: app not running after concurr
 if grep -qE "startup error|database is locked" smoke/logcat-concurrent.txt; then
   echo "::error::Scenario 2: database error during concurrent start."; exit 1
 fi
-echo "SMOKE TEST PASSED: both scenarios (pid $PID2)"
+echo "Scenario 2 passed (pid $PID2)"
+
+# Scenario 3: another app shares an image to Rumah Azan ("Kongsi").
+# The file:// URI is not readable by the app, so this exercises the SEND
+# intent filter, background copy and the rejected-file path: the app must
+# stay alive and not crash.
+adb push smoke/screenshot.png /sdcard/Download/ra_share_test.png >/dev/null 2>&1 || true
+adb logcat -c
+adb shell am start -W -a android.intent.action.SEND -t image/png \
+  --eu android.intent.extra.STREAM "file:///sdcard/Download/ra_share_test.png" \
+  -n "$PKG/.MainActivity"
+sleep 10
+PID3="$(adb shell pidof "$PKG" | tr -d '\r')"
+adb logcat -d > smoke/logcat-share.txt
+echo "===== Scenario 3: crash log ====="
+grep -A30 "FATAL EXCEPTION" smoke/logcat-share.txt | head -60 || true
+if [ -z "$PID3" ] || grep -q "FATAL EXCEPTION" smoke/logcat-share.txt; then
+  echo "::error::Scenario 3: app crashed after receiving a shared file."; exit 1
+fi
+echo "SMOKE TEST PASSED: all scenarios (pid $PID3)"

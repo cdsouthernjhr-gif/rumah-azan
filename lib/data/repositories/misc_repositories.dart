@@ -137,6 +137,32 @@ class WallpaperRepository {
     return db.into(db.wallpapers).insert(WallpapersCompanion.insert(name: name, filePath: target));
   }
 
+  /// Replaces the image of an existing custom wallpaper, keeping its id so
+  /// every slot/fixed selection that uses it shows the new image.
+  Future<void> replace(int id, Stream<List<int>> data, String fileName) async {
+    final ext = p.extension(fileName).toLowerCase();
+    if (!allowedExt.contains(ext)) throw ArgumentError('Format imej tidak disokong: $ext');
+    final row = await byId(id);
+    if (row == null) throw StateError('Wallpaper $id tidak wujud');
+    final d = await dir();
+    if (!await d.exists()) await d.create(recursive: true);
+    // New file name → no stale decoded image in Flutter's image cache.
+    final target = p.join(d.path, 'wp_${DateTime.now().microsecondsSinceEpoch}$ext');
+    final file = File(target);
+    final sink = file.openWrite();
+    try {
+      await sink.addStream(data);
+      await sink.close();
+    } catch (_) {
+      await sink.close();
+      if (await file.exists()) await file.delete();
+      rethrow;
+    }
+    await (db.update(db.wallpapers)..where((t) => t.id.equals(id))).write(WallpapersCompanion(filePath: Value(target)));
+    final old = File(row.filePath);
+    if (await old.exists()) await old.delete();
+  }
+
   Future<WallpaperRow?> byId(int id) =>
       (db.select(db.wallpapers)..where((t) => t.id.equals(id))).getSingleOrNull();
 

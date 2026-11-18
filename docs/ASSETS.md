@@ -6,7 +6,12 @@ No Quran recitation, azan or zikr recordings are shipped, because no
 recordings with a verified licence were available. The rule is: do not use
 unlicensed Quranic audio. Users can:
 
-- **Import** their own files (*Audio → +*), stored privately in the app; or
+- **Import** their own files (*Audio → +*), stored privately in the app;
+- **Share** audio/images from any app (WhatsApp, Files, Drive → *Kongsi* →
+  Rumah Azan) and choose *Tambah baharu* or *Ganti sedia ada*;
+- **Replace** an existing item's file (*Audio → ⋮ → Ganti fail*, or the ⇄
+  button on a custom wallpaper) — its playlists, azan choice and wallpaper
+  slots are kept; or
 - **Download** over HTTPS (*Audio → download*). Only download from sources
   whose licence permits it; the source host is kept with the file.
 

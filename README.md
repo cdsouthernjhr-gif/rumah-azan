@@ -35,6 +35,10 @@ Package: `com.rumahazan.app` · Flutter 3.50 · Android 7.0 (API 24) dan ke atas
 - **Pustaka audio:** import fail sendiri, muat turun HTTPS, senarai main,
   pemain penuh (main/jeda/henti/seterusnya/sebelum/ulang/rawak/kelantangan),
   tempoh audio dan sejarah main balik.
+- **Terima & ganti fail:** Rumah Azan muncul dalam menu *Kongsi* / *Buka
+  dengan* Android untuk audio dan gambar. Setiap fail boleh ditambah baharu
+  atau **mengganti** audio/wallpaper sedia ada (senarai main, pilihan azan
+  dan slot wallpaper dikekalkan). "Ganti fail" juga tersedia dalam pustaka.
 - **Wallpaper & tema:** 9 wallpaper Islamik dilukis secara vektor, import
   imej sendiri, bingkai (zum & kedudukan), kecerahan/lapisan gelap/kabur/muatan, pertukaran automatik
   pagi/tengah hari/petang/malam, 4 tema, saiz fon.

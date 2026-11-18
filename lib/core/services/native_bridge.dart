@@ -146,6 +146,24 @@ class NativeBridge {
   Future<void> setVolume(double v) => _call('setVolume', {'volume': v});
   Future<void> setRepeatMode(String mode) => _call('setRepeatMode', {'mode': mode});
   Future<void> setShuffle(bool on) => _call('setShuffle', {'on': on});
+  // ---- Files shared from other apps ("Kongsi" / "Buka dengan") ----------
+  /// Takes (and clears) files the native side received and copied to cache.
+  Future<List<IncomingFile>> takeIncomingFiles() async {
+    final r = await _call<List<Object?>>('takeIncomingFiles');
+    return [
+      for (final e in r ?? const [])
+        if (e is Map) IncomingFile.fromMap(e),
+    ];
+  }
+
+  /// Calls [onAvailable] whenever new shared files are waiting.
+  void listenIncomingFiles(void Function() onAvailable) {
+    _ch.setMethodCallHandler((call) async {
+      if (call.method == 'incomingFilesAvailable') onAvailable();
+      return null;
+    });
+  }
+
   /// Duration of a local audio file in ms (null if unknown/unavailable).
   Future<int?> audioDuration(String path) async {
     final r = await _call<Object?>('audioDuration', {'path': path});
@@ -162,4 +180,29 @@ class NativeBridge {
       .where((e) => e is Map)
       .map((e) => PlayerState.fromMap(e as Map<Object?, Object?>))
       .handleError((_) {});
+}
+
+/// A file another app shared with Rumah Azan, already copied to app cache.
+class IncomingFile {
+  const IncomingFile({required this.name, required this.kind, this.path, this.mime = '', this.error});
+
+  final String name;
+
+  /// audio | image | other
+  final String kind;
+
+  /// Cached copy (null when the file was rejected).
+  final String? path;
+  final String mime;
+  final String? error;
+
+  bool get usable => path != null && error == null && (kind == 'audio' || kind == 'image');
+
+  factory IncomingFile.fromMap(Map<Object?, Object?> m) => IncomingFile(
+        name: m['name'] as String? ?? '-',
+        kind: m['kind'] as String? ?? 'other',
+        path: m['path'] as String?,
+        mime: m['mime'] as String? ?? '',
+        error: m['error'] as String?,
+      );
 }

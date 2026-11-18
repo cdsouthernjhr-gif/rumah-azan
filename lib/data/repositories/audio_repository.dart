@@ -139,6 +139,41 @@ class AudioRepository {
       (db.update(db.audioLibrary)..where((t) => t.id.equals(id)))
           .write(AudioLibraryCompanion(title: Value(title), category: Value(category)));
 
+  /// Replaces the FILE of an existing library item, keeping its id, title,
+  /// category and every reference to it (playlists, azan choice, linked
+  /// content). The old file is removed only after the database points at the
+  /// new one, so a failed copy never loses the original. Returns the new path.
+  Future<String> replaceFile(int id, Stream<List<int>> data, String fileName) async {
+    final ext = p.extension(fileName).toLowerCase();
+    if (!allowedExt.contains(ext)) {
+      throw ArgumentError('Format audio tidak disokong: $ext');
+    }
+    final row = await (db.select(db.audioLibrary)..where((t) => t.id.equals(id))).getSingleOrNull();
+    if (row == null) throw StateError('Audio $id tidak wujud');
+    final target = await _uniqueTarget(fileName);
+    final file = File(target);
+    final sink = file.openWrite();
+    try {
+      await sink.addStream(data);
+      await sink.close();
+    } catch (_) {
+      await sink.close();
+      if (await file.exists()) await file.delete();
+      rethrow;
+    }
+    await (db.update(db.audioLibrary)..where((t) => t.id.equals(id))).write(AudioLibraryCompanion(
+      filePath: Value(target),
+      durationMs: const Value(null), // re-read by the duration backfill
+      sourceUrl: const Value(null),
+    ));
+    final old = File(row.filePath);
+    if (row.filePath != target && await old.exists()) await old.delete();
+    return target;
+  }
+
+  Future<AudioRow?> byId(int id) =>
+      (db.select(db.audioLibrary)..where((t) => t.id.equals(id))).getSingleOrNull();
+
   Future<void> delete(int id) async {
     final row = await (db.select(db.audioLibrary)..where((t) => t.id.equals(id))).getSingleOrNull();
     if (row == null) return;

@@ -31,13 +31,13 @@ class AppController {
       final last = await repo.lastCachedDate(zone);
       final fetched = await repo.lastFetchedAt(zone);
       final horizon = Myt.addDays(Myt.todayKey(), AppConstants.refreshCoverageDays);
-      final recent = fetched != null && DateTime.now().toUtc().difference(fetched) < const Duration(days: 3);
+      final recent = fetched != null && Myt.nowInstant().difference(fetched) < const Duration(days: 3);
       // Enough recent data cached for the scheduler horizon → avoid requests.
       if (last != null && last.compareTo(horizon) >= 0 && recent) return;
       // Source may only publish the current month (end-of-month gap): do not
       // re-request more than every 6 hours.
       if (last != null && last.compareTo(Myt.todayKey()) >= 0 && fetched != null &&
-          DateTime.now().toUtc().difference(fetched) < const Duration(hours: 6)) {
+          Myt.nowInstant().difference(fetched) < const Duration(hours: 6)) {
         return;
       }
     }
@@ -54,7 +54,7 @@ class AppController {
         provider: r.providerName,
       ));
       if (r.ok) {
-        await ref.read(settingsProvider.notifier).update({'lastSyncAt': DateTime.now().toUtc().toIso8601String()});
+        await ref.read(settingsProvider.notifier).update({'lastSyncAt': Myt.nowInstant().toIso8601String()});
         ref.read(dataVersionProvider.notifier).bump();
         await resyncSchedule();
       }

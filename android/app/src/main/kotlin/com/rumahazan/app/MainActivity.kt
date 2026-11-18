@@ -39,6 +39,10 @@ class MainActivity : FlutterActivity() {
 
     private var pendingPermission: MethodChannel.Result? = null
     private var sink: EventChannel.EventSink? = null
+    private var channel: MethodChannel? = null
+
+    /** Files shared to the app, waiting for Flutter to take them. */
+    private val pendingIncoming = mutableListOf<Map<String, Any?>>()
     private val playerListener: (Map<String, Any?>) -> Unit = { s -> runOnUiThread { sink?.success(s) } }
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
@@ -47,13 +51,16 @@ class MainActivity : FlutterActivity() {
         Notifications.ensureChannels(this)
         BackgroundSyncJob.ensureScheduled(this)
         val messenger = flutterEngine.dartExecutor.binaryMessenger
-        MethodChannel(messenger, CHANNEL).setMethodCallHandler { call, result ->
-            try {
-                handle(call, result)
-            } catch (t: Throwable) {
-                result.error("native_error", t.message, null)
+        channel = MethodChannel(messenger, CHANNEL).also {
+            it.setMethodCallHandler { call, result ->
+                try {
+                    handle(call, result)
+                } catch (t: Throwable) {
+                    result.error("native_error", t.message, null)
+                }
             }
         }
+        handleIncoming(intent) // app opened via "Kongsi" / "Buka dengan"
         EventChannel(messenger, EVENTS).setStreamHandler(object : EventChannel.StreamHandler {
             override fun onListen(arguments: Any?, events: EventChannel.EventSink) {
                 sink = events
@@ -66,6 +73,28 @@ class MainActivity : FlutterActivity() {
                 sink = null
             }
         })
+    }
+
+    // launchMode=singleTop: shares while the app is open arrive here.
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        handleIncoming(intent)
+    }
+
+    private fun handleIncoming(intent: Intent?) {
+        val uris = IncomingFiles.urisFrom(intent)
+        if (uris.isEmpty()) return
+        intent?.action = null // never process the same share twice (e.g. recreation)
+        Thread {
+            val files = IncomingFiles.copyToCache(applicationContext, uris)
+            runOnUiThread {
+                synchronized(pendingIncoming) { pendingIncoming.addAll(files) }
+                // Flutter may not be listening yet (cold start); it also asks
+                // with takeIncomingFiles when it is ready.
+                channel?.invokeMethod("incomingFilesAvailable", null)
+            }
+        }.start()
     }
 
     override fun onDestroy() {
@@ -145,6 +174,14 @@ class MainActivity : FlutterActivity() {
             "setRepeatMode" -> cmd(PlaybackService.ACTION_REPEAT, result) { it.putExtra("mode", call.argument<String>("mode") ?: "off") }
             "setShuffle" -> cmd(PlaybackService.ACTION_SHUFFLE, result) { it.putExtra("on", call.argument<Boolean>("on") ?: false) }
             "playerState" -> result.success(PlaybackService.state)
+            "takeIncomingFiles" -> {
+                val files = synchronized(pendingIncoming) {
+                    val copy = pendingIncoming.toList()
+                    pendingIncoming.clear()
+                    copy
+                }
+                result.success(files)
+            }
             else -> result.notImplemented()
         }
     }
