@@ -67,6 +67,12 @@ alive after 30 s; crash and Flutter logs are printed and uploaded.
 - Also hardened start-up: no drift `shareAcrossIsolates` (could retry
   forever) and a visible start-up error screen instead of a frozen splash.
 
+## Verified on a real device
+
+| Device | Build | Result |
+|---|---|---|
+| Samsung Galaxy S21 | 10 | Receiving a file shared from another app ("Kongsi" → Rumah Azan → *Fail diterima*) works, as reported by the user. |
+
 ## NOT executed: required on-device matrix
 
 Run on at least one phone (Android 13/14/15), one tablet and one Android TV
