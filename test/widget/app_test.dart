@@ -11,7 +11,9 @@ import 'package:rumah_azan/data/models/app_settings.dart';
 import 'package:rumah_azan/data/providers/providers.dart';
 import 'package:rumah_azan/data/repositories/diagnostics_repository.dart';
 import 'package:rumah_azan/data/repositories/prayer_repository.dart';
+import 'package:rumah_azan/features/smart_display/display_gallery_screen.dart';
 import 'package:rumah_azan/features/smart_display/display_mode_screen.dart';
+import 'package:rumah_azan/features/wallpaper/wallpaper_view.dart';
 import 'package:rumah_azan/features/tasbih/tasbih_screen.dart';
 
 import '../helpers.dart';
@@ -185,6 +187,45 @@ void main() {
     await tester.sendKeyEvent(LogicalKeyboardKey.select); // D-pad centre
     await settle(tester);
     expect(find.byType(TasbihScreen), findsOneWidget);
+    await teardown(tester, db);
+  });
+
+  testWidgets('Display Mode: 4 gallery images over 24 h → 15:25 shows image #3', (tester) async {
+    const gallery = ['builtin:morning_sunrise', 'builtin:afternoon_cream', 'builtin:evening_sunset', 'builtin:night_crescent'];
+    final db = await boot(
+      tester,
+      settings: configured.copyWith({'displayRotation': 'day', 'displayGallery': gallery}),
+      size: const Size(1280, 720),
+    );
+    final nav = tester.state<NavigatorState>(find.byType(Navigator).first);
+    nav.push(MaterialPageRoute(builder: (_) => const DisplayModeScreen()));
+    await settle(tester);
+    // 15:25 → minute 925 → 925*4/1440 = 2 (12:00–18:00 slot).
+    expect(
+      find.byWidgetPredicate((w) => w is WallpaperView && w.refString == 'builtin:evening_sunset'),
+      findsOneWidget,
+    );
+    expect(find.byTooltip('Galeri Mod Paparan'), findsOneWidget);
+    await teardown(tester, db);
+  });
+
+  testWidgets('Gallery screen lists time ranges and marks the image showing now', (tester) async {
+    const gallery = ['builtin:morning_sunrise', 'builtin:afternoon_cream', 'builtin:evening_sunset', 'builtin:night_crescent'];
+    final db = await boot(
+      tester,
+      settings: configured.copyWith({'displayRotation': 'day', 'displayGallery': gallery}),
+      home: null,
+    );
+    final nav = tester.state<NavigatorState>(find.byType(Navigator).first);
+    nav.push(MaterialPageRoute(builder: (_) => const DisplayGalleryScreen()));
+    await settle(tester);
+    expect(find.text('00:00 – 06:00'), findsOneWidget);
+    expect(find.text('12:00 – 18:00 · sedang dipaparkan'), findsOneWidget);
+    expect(find.textContaining('4 gambar, setiap gambar dipaparkan 6 jam 0 minit'), findsOneWidget);
+    // Remove one → 3 images → 8 hours each.
+    await tester.tap(find.byTooltip('Buang').first);
+    await settle(tester);
+    expect(find.text('00:00 – 08:00'), findsOneWidget);
     await teardown(tester, db);
   });
 }

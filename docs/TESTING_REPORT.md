@@ -8,7 +8,7 @@ device, no access to the JAKIM host.
 | Command | Result |
 |---|---|
 | `flutter analyze` | **No issues found** |
-| `flutter test` | **80 tests passed, 0 failed** |
+| `flutter test` | **86 tests passed, 0 failed** |
 | Kotlin type-check (kotlinc 2.4.20 vs Android framework + Flutter embedding) | **0 errors**; all 15 classes compiled |
 | `flutter build apk --debug` (local container) | Not possible: "No Android SDK found" (SDK download host blocked) |
 | GitHub Actions "Bina APK" (run #1, commit b2d8865) | **Success**: analyze, tests and a full Gradle debug build passed; artifact `rumah-azan-debug-apk` (≈ 97 MB zip) |
@@ -72,6 +72,7 @@ alive after 30 s; crash and Flutter logs are printed and uploaded.
 | Device | Build | Result |
 |---|---|---|
 | Samsung Galaxy S21 | 10 | Receiving a file shared from another app ("Kongsi" → Rumah Azan → *Fail diterima*) works, as reported by the user. |
+| Samsung Galaxy S21 | 10 | Display Mode (portrait) shows the JHR03 timetable for 18 Nov 2026 (Subuh 05:39 … Isyak 20:07) **without the estimate label**, i.e. verified timetable data was downloaded on the device; Hijri date and countdown shown correctly (user screenshot). |
 
 ## NOT executed: required on-device matrix
 

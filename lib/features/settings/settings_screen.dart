@@ -20,6 +20,7 @@ import '../audio_player/audio_library_screen.dart';
 import '../audio_scheduler/scheduler_settings_screen.dart';
 import '../diagnostics/diagnostics_screen.dart';
 import '../location/zone_picker_screen.dart';
+import '../smart_display/display_gallery_screen.dart';
 import '../smart_display/display_mode_screen.dart';
 import '../wallpaper/wallpaper_screen.dart';
 
@@ -229,20 +230,13 @@ class SettingsScreen extends ConsumerWidget {
         ),
         minutesTile(context.tr('auto_return_display'), 'displayAutoReturnMin', s.displayAutoReturnMin, const [0, 2, 5, 10, 30]),
         minutesTile(context.tr('screensaver_after'), 'screensaverMin', s.screensaverMin, const [0, 5, 10, 30, 60]),
-        SwitchListTile(
-          title: Text(context.tr('slideshow')),
-          value: s.slideshow,
-          onChanged: (v) => n.update({'slideshow': v}),
+        ListTile(
+          leading: const Icon(Icons.photo_library_outlined),
+          title: Text(context.tr('display_gallery')),
+          subtitle: Text(context.tr('display_gallery_sub')),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () => push(context, const DisplayGalleryScreen()),
         ),
-        if (s.slideshow)
-          ListTile(
-            title: Text(context.tr('slideshow_interval')),
-            trailing: DropdownButton<int>(
-              value: const [30, 60, 300, 900].contains(s.slideshowSec) ? s.slideshowSec : 60,
-              items: [for (final o in const [30, 60, 300, 900]) DropdownMenuItem(value: o, child: Text('${o}s'))],
-              onChanged: (v) => n.update({'slideshowSec': v}),
-            ),
-          ),
 
         // SLEEP
         SectionHeader(context.tr('sleep_mode')),

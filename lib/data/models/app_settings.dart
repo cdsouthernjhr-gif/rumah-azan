@@ -42,7 +42,9 @@ class AppSettings {
     'startInDisplayMode': false,
     'displayAutoReturnMin': 0, // 0 = off
     'screensaverMin': 0, // 0 = off
-    'slideshow': false,
+    'slideshow': false, // legacy; superseded by displayRotation
+    'displayGallery': <String>[], // wallpaper refs used by Display Mode
+    'displayRotation': null, // off | day | interval (null → from legacy slideshow)
     'slideshowSec': 60,
     // Sleep mode
     'sleepScheduled': false,
@@ -122,6 +124,19 @@ class AppSettings {
   int get displayAutoReturnMin => _int('displayAutoReturnMin');
   int get screensaverMin => _int('screensaverMin');
   bool get slideshow => _get<bool>('slideshow');
+
+  /// Images chosen for Display Mode, in order (wallpaper refs).
+  List<String> get displayGallery {
+    final v = raw['displayGallery'];
+    return v is List ? v.whereType<String>().toList() : const [];
+  }
+
+  /// off | day | interval. Older settings with "slideshow" on map to interval.
+  String get displayRotation {
+    final v = raw['displayRotation'];
+    if (v is String && const ['off', 'day', 'interval'].contains(v)) return v;
+    return slideshow ? 'interval' : 'off';
+  }
   int get slideshowSec => _int('slideshowSec').clamp(10, 3600);
 
   bool get sleepScheduled => _get<bool>('sleepScheduled');

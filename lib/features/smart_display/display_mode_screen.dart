@@ -14,6 +14,8 @@ import '../../shared/widgets/common.dart';
 import '../dashboard/dashboard_screen.dart' show formatGregorian;
 import '../wallpaper/builtin_wallpapers.dart';
 import '../wallpaper/wallpaper_view.dart';
+import 'display_gallery.dart';
+import 'display_gallery_screen.dart';
 
 /// Full-screen Smart Mosque / Home Display, landscape-first, for Android TV
 /// boxes, smart TVs and wall-mounted tablets. Fully usable with a D-pad.
@@ -39,8 +41,19 @@ class _DisplayModeScreenState extends ConsumerState<DisplayModeScreen> {
     // Keep-screen-on only if the user enabled it (never forced).
     if (s.keepScreenOn) _bridge.setKeepScreenOn(true);
     _resetIdle();
-    if (s.slideshow) {
-      _slide = Timer.periodic(Duration(seconds: s.slideshowSec), (_) => setState(() => _slideIndex++));
+    _restartSlideTimer();
+  }
+
+  /// Only the "interval" rotation needs a timer; the 24-hour rotation is
+  /// derived from the clock on every second tick.
+  void _restartSlideTimer() {
+    _slide?.cancel();
+    _slide = null;
+    final s = ref.read(settingsProvider);
+    if (parseRotation(s.displayRotation) == GalleryRotation.interval) {
+      _slide = Timer.periodic(Duration(seconds: s.slideshowSec), (_) {
+        if (mounted) setState(() => _slideIndex++);
+      });
     }
   }
 
@@ -60,20 +73,31 @@ class _DisplayModeScreenState extends ConsumerState<DisplayModeScreen> {
     super.dispose();
   }
 
-  String _wallpaperRef() {
-    final s = ref.read(settingsProvider);
-    if (!s.slideshow) return ref.watch(activeWallpaperProvider);
-    final customs = ref.watch(customWallpapersProvider).value ?? const [];
-    final all = [
-      for (final w in builtinWallpapers) w.ref,
-      for (final c in customs) 'custom:${c.id}',
-    ];
-    return all[_slideIndex % all.length];
+  String _wallpaperRef(DateTime now) {
+    final s = ref.watch(settingsProvider);
+    final gallery = ref.watch(displayGalleryProvider);
+    switch (parseRotation(s.displayRotation)) {
+      case GalleryRotation.off:
+        return ref.watch(activeWallpaperProvider);
+      case GalleryRotation.day:
+        // N images share the day evenly: 24/N hours each from 00:00 (MYT).
+        if (gallery.isEmpty) return ref.watch(activeWallpaperProvider);
+        final w = Myt.toWall(now);
+        return gallery[galleryIndexAt(gallery.length, w.hour * 60 + w.minute)];
+      case GalleryRotation.interval:
+        final customs = ref.watch(customWallpapersProvider).value ?? const [];
+        final list = gallery.isNotEmpty
+            ? gallery
+            : [for (final w in builtinWallpapers) w.ref, for (final c in customs) 'custom:${c.id}'];
+        return list[_slideIndex % list.length];
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final now = ref.watch(secondTickProvider).value ?? Myt.nowInstant();
+    ref.listen(settingsProvider.select((s) => (s.displayRotation, s.slideshowSec)), (_, _) => _restartSlideTimer());
+    final wallpaper = _wallpaperRef(now);
     return Focus(
       autofocus: true,
       onKeyEvent: (_, e) {
@@ -89,8 +113,8 @@ class _DisplayModeScreenState extends ConsumerState<DisplayModeScreen> {
             AnimatedSwitcher(
               duration: const Duration(seconds: 2),
               child: WallpaperView(
-                key: ValueKey(_saver ? 'saver' : _wallpaperRef()),
-                refString: _wallpaperRef(),
+                key: ValueKey(_saver ? 'saver:$wallpaper' : wallpaper),
+                refString: wallpaper,
                 extraDim: _saver ? 0.55 : 0,
               ),
             ),
@@ -99,11 +123,21 @@ class _DisplayModeScreenState extends ConsumerState<DisplayModeScreen> {
               Positioned(
                 top: 8,
                 right: 8,
-                child: IconButton(
-                  tooltip: context.tr('close'),
-                  icon: const Icon(Icons.close_rounded, color: Colors.white70),
-                  onPressed: () => Navigator.pop(context),
-                ),
+                child: Row(mainAxisSize: MainAxisSize.min, children: [
+                  IconButton(
+                    tooltip: context.tr('display_gallery'),
+                    icon: const Icon(Icons.photo_library_outlined, color: Colors.white70),
+                    onPressed: () async {
+                      await push(context, const DisplayGalleryScreen());
+                      _resetIdle();
+                    },
+                  ),
+                  IconButton(
+                    tooltip: context.tr('close'),
+                    icon: const Icon(Icons.close_rounded, color: Colors.white70),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ]),
               ),
           ]),
         ),
@@ -183,7 +217,7 @@ class _DisplayLayout extends ConsumerWidget {
       final main = Column(children: [
         // TOP: time, date, location
         Padding(
-          padding: EdgeInsets.fromLTRB(24 * scale, 16 * scale, 56, 0),
+          padding: EdgeInsets.fromLTRB(24 * scale, 16 * scale, portrait ? 24 * scale : 112, 0),
           child: portrait
               ? Column(children: [FittedBox(fit: BoxFit.scaleDown, child: clock), dateInfo])
               : Row(crossAxisAlignment: CrossAxisAlignment.start, children: [

@@ -196,6 +196,9 @@ class WallpaperScreen extends ConsumerWidget {
                             if (s.wallpaperForSlot(slot) == refStr)
                               'wallpaper${slot[0].toUpperCase()}${slot.substring(1)}':
                                   AppSettings.defaults['wallpaper${slot[0].toUpperCase()}${slot.substring(1)}'],
+                          // …and drop it from the Display Mode gallery.
+                          if (s.displayGallery.contains(refStr))
+                            'displayGallery': [...s.displayGallery]..remove(refStr),
                         };
                         if (patch.isNotEmpty) await notifier.update(patch);
                         await ref.read(wallpaperRepoProvider).delete(c.id);
