@@ -40,7 +40,7 @@ Future<void> main() async {
 /// background sync engine) briefly holds a lock.
 Future<(AppDatabase, AppSettings)> _openStorage() async {
   for (var attempt = 1;; attempt++) {
-    final db = openAppDatabase();
+    final db = await openAppDatabaseReady();
     try {
       final settings = await SettingsRepository(db).load();
       await PrayerRepository(db, DiagnosticsRepository(db)).ensureZonesSeeded();

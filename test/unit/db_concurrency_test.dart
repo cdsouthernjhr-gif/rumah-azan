@@ -17,11 +17,18 @@ void main() {
   test('two separate connections can create and use the same new file concurrently', () async {
     final dir = await Directory.systemTemp.createTemp('ra_db');
     final file = File('${dir.path}/rumah_azan.sqlite');
-    AppDatabase open() => AppDatabase(NativeDatabase.createInBackground(file, setup: configureSqliteConnection));
+    // Two engines in one process = two drift instances on the same file.
+    driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
+    Future<AppDatabase> open() => openAppDatabaseReady(
+          open: () => AppDatabase(NativeDatabase.createInBackground(file, setup: configureSqliteConnection)),
+        );
 
-    for (var round = 0; round < 5; round++) {
-      if (file.existsSync()) file.deleteSync();
-      final a = open(), b = open();
+    for (var round = 0; round < 25; round++) {
+      for (final f in [file, File('${file.path}-wal'), File('${file.path}-shm')]) {
+        if (f.existsSync()) f.deleteSync();
+      }
+      final opened = await Future.wait([open(), open()]);
+      final a = opened[0], b = opened[1];
       Future<void> use(AppDatabase db) async {
         await SettingsRepository(db).load(); // triggers migrations (CREATE TABLE …)
         await PrayerRepository(db, DiagnosticsRepository(db)).ensureZonesSeeded();

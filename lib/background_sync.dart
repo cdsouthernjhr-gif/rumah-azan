@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:drift_flutter/drift_flutter.dart';
 import 'package:sqlite3/common.dart' show CommonDatabase;
 import 'package:flutter/services.dart';
@@ -26,6 +28,33 @@ AppDatabase openAppDatabase() => AppDatabase(driftDatabase(
       native: DriftNativeOptions(setup: configureSqliteConnection),
     ));
 
+/// True for SQLite "busy"/"locked" errors (another connection holds a lock).
+bool isSqliteBusy(Object e) {
+  final s = e.toString();
+  return s.contains('database is locked') || s.contains('SQLITE_BUSY') || s.contains('(code 5)') || s.contains('(code 6)');
+}
+
+/// Opens the database AND runs its migrations, retrying if another
+/// connection (UI vs background engine) is creating the same new file at
+/// that moment. In some first-open cases SQLite answers "locked" at once
+/// without honouring busy_timeout, so a bounded retry with random jitter is
+/// what makes concurrent first opens reliable.
+Future<AppDatabase> openAppDatabaseReady({AppDatabase Function()? open, int attempts = 8}) async {
+  final opener = open ?? openAppDatabase;
+  final rnd = math.Random();
+  for (var i = 1;; i++) {
+    final db = opener();
+    try {
+      await db.customSelect('SELECT 1').get(); // forces open + migrations
+      return db;
+    } catch (e) {
+      await db.close();
+      if (!isSqliteBusy(e) || i >= attempts) rethrow;
+      await Future<void>.delayed(Duration(milliseconds: 150 * i + rnd.nextInt(250)));
+    }
+  }
+}
+
 /// Per-connection SQLite settings (also used by tests).
 void configureSqliteConnection(CommonDatabase db) {
   db.execute('PRAGMA busy_timeout = 10000');
@@ -34,7 +63,10 @@ void configureSqliteConnection(CommonDatabase db) {
   // when another connection is active. WAL is persistent in the file, so it
   // is enough that one connection succeeds; ignore failure here.
   try {
-    db.select('PRAGMA journal_mode = WAL');
+    // Only switch when needed: after the first open the file stays WAL, so
+    // later opens never race on the mode change.
+    final mode = db.select('PRAGMA journal_mode').first.values.first;
+    if ('$mode'.toLowerCase() != 'wal') db.select('PRAGMA journal_mode = WAL');
   } on Object {
     // Another connection is using the file; it will (or did) enable WAL.
   }
@@ -84,7 +116,7 @@ Future<void> runBackgroundSync() async {
   var ok = false;
   AppDatabase? db;
   try {
-    db = openAppDatabase();
+    db = await openAppDatabaseReady();
     ok = (await performBackgroundSync(db)).ok;
   } catch (e) {
     debugPrint('background sync failed: $e');
