@@ -7,9 +7,18 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <!-- Android 13+: runtime permission for prayer notifications. -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-    <!-- Android 12+: exact alarms for azan. User-grantable; the app degrades to
-         inexact alarms (and reports it in Diagnostics) when not granted. -->
-    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <!-- Exact alarms for the azan.
+         Android 13+: USE_EXACT_ALARM is granted at install for alarm-type apps
+         (an azan IS a prayer-time alarm). Without it, Android 14+ denies
+         SCHEDULE_EXACT_ALARM by default, alarms become inexact, and Android
+         then forbids starting the azan audio from the background.
+         NOTE for Google Play: USE_EXACT_ALARM is reviewed by Play policy
+         (alarm/calendar apps only) — see docs/BUILD.md.
+         Android 12 / 12L: SCHEDULE_EXACT_ALARM (user-grantable). -->
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <uses-permission
+        android:name="android.permission.SCHEDULE_EXACT_ALARM"
+        android:maxSdkVersion="32" />
     <!-- Restore the schedule after reboot / app update / time change. -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <!-- Keep CPU awake while scheduled audio plays (MediaPlayer wake mode). -->

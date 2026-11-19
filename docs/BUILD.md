@@ -92,3 +92,13 @@ download host (dl.google.com) was blocked. The Kotlin sources were
 type-checked separately with Kotlin 2.4.20 against the Android framework
 (Robolectric `android-all`) and the Flutter 3.50 embedding jar, with no
 errors. A full Gradle/AGP build and lint on a workstation is still required.
+
+## Exact alarms and Google Play
+
+The azan is an alarm, so the app declares `USE_EXACT_ALARM` (granted at
+install on Android 13+) and `SCHEDULE_EXACT_ALARM` only up to Android 12L.
+Without exact alarms, Android 14+ also refuses to start the azan audio from
+the background, which made scheduled sound silent. Google Play reviews
+`USE_EXACT_ALARM` (allowed for alarm/calendar apps). If Play rejects it,
+switch to `SCHEDULE_EXACT_ALARM` for all versions and rely on the in-app
+"Penggera tepat" prompt (Diagnostik → Uji bunyi) to get the user's consent.

@@ -7,6 +7,7 @@ import 'core/services/app_controller.dart';
 import 'core/theme/app_theme.dart';
 import 'data/providers/providers.dart';
 import 'features/dashboard/dashboard_screen.dart';
+import 'features/diagnostics/sound_test_screen.dart';
 import 'features/incoming/incoming_files_screen.dart';
 import 'features/onboarding/onboarding_screen.dart';
 import 'features/sleep_mode/sleep_mode_screen.dart';
@@ -79,6 +80,7 @@ class _RumahAzanAppState extends ConsumerState<RumahAzanApp> with WidgetsBinding
       _checkIncomingFiles();
       ref.read(appControllerProvider).onResume();
       ref.invalidate(dayWindowProvider);
+      ref.invalidate(phoneSoundProvider); // permissions may have changed in Settings
     }
   }
 

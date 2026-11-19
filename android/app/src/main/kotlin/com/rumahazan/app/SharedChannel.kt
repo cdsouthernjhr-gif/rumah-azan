@@ -43,7 +43,15 @@ object SharedChannel {
                     put("kind", "test")
                     put("title", call.argument<String>("title") ?: "Rumah Azan")
                     put("body", call.argument<String>("body") ?: "")
-                    put("items", JSONArray())
+                    // Optional audio file → exercises the real scheduled-azan
+                    // path (alarm → foreground playback service).
+                    val items = JSONArray()
+                    call.argument<String>("audioPath")?.let { path ->
+                        items.put(JSONObject().put("path", path).put("title", call.argument<String>("title") ?: "Test"))
+                    }
+                    put("items", items)
+                    put("volume", 1.0)
+                    put("maxDurationMs", 20_000)
                     put("notify", true)
                     put("notifySound", true)
                     put("vibrate", true)
@@ -53,6 +61,22 @@ object SharedChannel {
                 result.success(true)
             }
             "drainPlaybackHistory" -> result.success(Scheduler.drainHistory(ctx))
+            "soundStatus" -> result.success(SoundCheck.status(ctx))
+            "playClick" -> {
+                SoundCheck.click(call.argument<Int>("volume") ?: 60)
+                result.success(null)
+            }
+            "testNotification" -> {
+                Notifications.showEvent(
+                    ctx,
+                    JSONObject().put("id", "sound_test").put("kind", "test")
+                        .put("title", call.argument<String>("title") ?: "Rumah Azan")
+                        .put("body", call.argument<String>("body") ?: ""),
+                    sound = true,
+                    vibrate = true,
+                )
+                result.success(Notifications.canPost(ctx))
+            }
             "audioDuration" -> {
                 // Off the main thread: metadata extraction reads the file.
                 val path = call.argument<String>("path") ?: ""

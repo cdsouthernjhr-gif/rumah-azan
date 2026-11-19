@@ -62,7 +62,9 @@ class _TasbihScreenState extends ConsumerState<TasbihScreen> {
     if (_vibrate) {
       _count == _target ? HapticFeedback.heavyImpact() : HapticFeedback.selectionClick();
     }
-    if (_sound) SystemSound.play(SystemSoundType.click);
+    // SystemSound.click is silent when the phone's "touch sounds" are off
+    // (the default on many phones); use an explicit short tone instead.
+    if (_sound) ref.read(nativeBridgeProvider).playClick();
     if (_count % 10 == 0 || _count == _target) _persist();
   }
 

@@ -11,6 +11,9 @@ import 'package:rumah_azan/data/models/app_settings.dart';
 import 'package:rumah_azan/data/providers/providers.dart';
 import 'package:rumah_azan/data/repositories/diagnostics_repository.dart';
 import 'package:rumah_azan/data/repositories/prayer_repository.dart';
+import 'package:flutter_riverpod/misc.dart' show Override;
+import 'package:rumah_azan/core/services/native_bridge.dart';
+import 'package:rumah_azan/features/diagnostics/sound_test_screen.dart';
 import 'package:rumah_azan/features/smart_display/display_gallery_screen.dart';
 import 'package:rumah_azan/features/smart_display/display_mode_screen.dart';
 import 'package:rumah_azan/features/wallpaper/wallpaper_view.dart';
@@ -28,6 +31,7 @@ Future<AppDatabase> boot(
   DateTime? now,
   Widget? home,
   Size size = const Size(1080 / 2.5, 2200 / 2.5),
+  List<Override> extraOverrides = const [],
 }) async {
   final clock = now ?? myt('2026-11-12', '15:25');
   Myt.clock = () => clock;
@@ -47,6 +51,7 @@ Future<AppDatabase> boot(
     overrides: [
       databaseProvider.overrideWithValue(db),
       initialSettingsProvider.overrideWithValue(settings),
+      ...extraOverrides,
     ],
     child: home ?? const RumahAzanApp(),
   ));
@@ -228,5 +233,45 @@ void main() {
     expect(find.text('00:00 – 08:00'), findsOneWidget);
     await teardown(tester, db);
   });
+
+  testWidgets('sound blocked → dashboard warning; Uji bunyi lists causes with fixes', (tester) async {
+    final db = await boot(
+      tester,
+      settings: configured,
+      extraOverrides: [
+        nativeBridgeProvider.overrideWithValue(_FakeSoundBridge({
+          'ringerMode': 'vibrate',
+          'dnd': false,
+          'notificationsEnabled': false,
+          'exactAlarmAllowed': true,
+          'respectSilent': true,
+          'music': {'cur': 8, 'max': 15},
+          'alarm': {'cur': 6, 'max': 7},
+          'notification': {'cur': 5, 'max': 15},
+          'channels': <String, Object?>{},
+        })),
+      ],
+    );
+    expect(find.textContaining('Bunyi azan disekat: Pemberitahuan dimatikan'), findsOneWidget);
+    await tester.tap(find.text('Baiki'));
+    await settle(tester);
+    expect(find.byType(SoundTestScreen), findsOneWidget);
+    expect(find.text('Pemberitahuan dimatikan'), findsOneWidget);
+    expect(find.text('Telefon dalam mod vibrate'), findsOneWidget);
+    expect(find.text('Benarkan'), findsOneWidget);
+    expect(find.text('Mainkan juga'), findsOneWidget);
+    await tester.scrollUntilVisible(find.text('Uji azan berjadual (15 saat)'), 200,
+        scrollable: find.byType(Scrollable).last);
+    expect(find.text('Uji azan berjadual (15 saat)'), findsOneWidget);
+    await teardown(tester, db);
+  });
+}
+
+/// Native bridge stand-in that reports a given phone sound state.
+class _FakeSoundBridge extends NativeBridge {
+  _FakeSoundBridge(this.status);
+  final Map<String, Object?> status;
+  @override
+  Future<Map<String, Object?>> soundStatus() async => status;
 }
 

@@ -33,6 +33,15 @@ if grep -q "startup error" smoke/logcat.txt; then
 fi
 echo "Scenario 1 passed: first launch, $PKG running (pid $PID)"
 
+# Exact alarms must be available out of the box (Android 14 denies
+# SCHEDULE_EXACT_ALARM by default; without exact alarms the azan audio
+# cannot start from the background).
+echo "===== Permissions ====="
+adb shell dumpsys package "$PKG" | grep -E "USE_EXACT_ALARM|SCHEDULE_EXACT_ALARM|POST_NOTIFICATIONS|FOREGROUND_SERVICE" || true
+if ! adb shell dumpsys package "$PKG" | grep -q "android.permission.USE_EXACT_ALARM: granted=true"; then
+  echo "::error::USE_EXACT_ALARM is not granted — scheduled azan audio would be blocked."; exit 1
+fi
+
 # Scenario 2 (Galaxy S21 report): the background-sync engine and the UI open
 # the database at the same time. Close the UI (process stays), force-run the
 # job, and immediately relaunch the app.

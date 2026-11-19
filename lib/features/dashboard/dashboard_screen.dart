@@ -11,6 +11,7 @@ import '../../shared/widgets/common.dart';
 import '../audio_player/audio_library_screen.dart';
 import '../audio_player/player_bar.dart';
 import '../audio_scheduler/scheduler_settings_screen.dart';
+import '../diagnostics/sound_test_screen.dart';
 import '../islamic_calendar/calendar_screen.dart';
 import '../islamic_calendar/domain/calendar_service.dart';
 import '../location/zone_picker_screen.dart';
@@ -185,6 +186,22 @@ class _DataWarnings extends ConsumerWidget {
     });
     if (sync.lastOk == false && sync.lastError != null) {
       children.add(WarningBanner(icon: Icons.cloud_off_rounded, text: context.tr('warn_sync_failed')));
+    }
+    // Things that silence the azan entirely (notifications off, exact alarms
+    // not allowed, prayer channel blocked) — shown until fixed.
+    final sound = ref.watch(phoneSoundProvider).value ?? const {};
+    final blocking = analyseSound(sound)
+        .where((i) => const {'notif_off', 'channel_blocked', 'channel_silent', 'exact_off'}.contains(i.key))
+        .toList();
+    if (blocking.isNotEmpty) {
+      children.add(WarningBanner(
+        icon: Icons.volume_off_rounded,
+        text: '${context.tr('warn_sound_blocked')} ${blocking.map((i) => context.tr('snd_${i.key}')).join(' · ')}',
+        action: TextButton(
+          onPressed: () => push(context, const SoundTestScreen()),
+          child: Text(context.tr('fix')),
+        ),
+      ));
     }
     if (children.isEmpty) return const SizedBox.shrink();
     return Padding(padding: const EdgeInsets.only(top: 8), child: Column(children: children));

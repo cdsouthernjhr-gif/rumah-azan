@@ -19,6 +19,7 @@ import '../../shared/widgets/common.dart';
 import '../audio_player/audio_library_screen.dart';
 import '../audio_scheduler/scheduler_settings_screen.dart';
 import '../diagnostics/diagnostics_screen.dart';
+import '../diagnostics/sound_test_screen.dart';
 import '../location/zone_picker_screen.dart';
 import '../smart_display/display_gallery_screen.dart';
 import '../smart_display/display_mode_screen.dart';
@@ -132,6 +133,13 @@ class SettingsScreen extends ConsumerWidget {
           subtitle: Text(context.tr('audio_schedule_sub')),
           trailing: const Icon(Icons.chevron_right),
           onTap: () => push(context, const SchedulerSettingsScreen()),
+        ),
+        ListTile(
+          leading: const Icon(Icons.volume_up_outlined),
+          title: Text(context.tr('sound_test')),
+          subtitle: Text(context.tr('sound_test_sub')),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () => push(context, const SoundTestScreen()),
         ),
         ListTile(
           leading: const Icon(Icons.library_music_outlined),

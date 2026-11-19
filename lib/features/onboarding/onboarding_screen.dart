@@ -93,6 +93,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 icon: const Icon(Icons.check_rounded),
                 label: Text(context.tr('confirm_zone_start', {'z': zone.code})),
                 onPressed: () async {
+                  // Android 13+ blocks ALL notifications (and their sound)
+                  // until this is granted — ask now, not only via a button.
+                  await ref.read(nativeBridgeProvider).requestNotificationPermission();
                   await ref.read(settingsProvider.notifier).update({'zoneCode': _zone, 'onboardingDone': true});
                   ref.read(appControllerProvider).refreshPrayerData(force: true);
                 },

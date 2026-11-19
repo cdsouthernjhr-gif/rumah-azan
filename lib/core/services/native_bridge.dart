@@ -96,9 +96,26 @@ class NativeBridge {
       (await _call<int>('syncSchedule', {'events': events, 'options': options})) ?? 0;
   Future<void> cancelSchedule() => _call('cancelSchedule');
   Future<Map<String, Object?>> schedulerStatus() => _map('schedulerStatus');
-  Future<bool> scheduleTestEvent(int secondsFromNow, String title, String body) async =>
-      (await _call<bool>('scheduleTestEvent', {'seconds': secondsFromNow, 'title': title, 'body': body})) ??
+  /// Schedules a test alarm. With [audioPath] it plays that file through the
+  /// same path as a scheduled azan (alarm → foreground playback service).
+  Future<bool> scheduleTestEvent(int secondsFromNow, String title, String body, {String? audioPath}) async =>
+      (await _call<bool>('scheduleTestEvent', {
+        'seconds': secondsFromNow,
+        'title': title,
+        'body': body,
+        'audioPath': audioPath,
+      })) ??
       false;
+
+  /// Volumes, ringer/DND state, notification channels, permissions.
+  Future<Map<String, Object?>> soundStatus() => _map('soundStatus');
+
+  /// Audible tasbih click (media stream; independent of "touch sounds").
+  Future<void> playClick({int volume = 60}) => _call('playClick', {'volume': volume});
+
+  /// Posts a notification with sound right now. Returns false if blocked.
+  Future<bool> testNotification(String title, String body) async =>
+      (await _call<bool>('testNotification', {'title': title, 'body': body})) ?? false;
   Future<List<Map<String, Object?>>> drainPlaybackHistory() async {
     final r = await _call<List<Object?>>('drainPlaybackHistory');
     return [

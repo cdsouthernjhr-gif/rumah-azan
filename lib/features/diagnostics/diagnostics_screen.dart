@@ -10,6 +10,7 @@ import '../../core/utilities/myt_time.dart';
 import '../../data/local/database.dart';
 import '../../data/providers/providers.dart';
 import '../../shared/widgets/common.dart';
+import 'sound_test_screen.dart';
 
 /// Flutter injects these at build time (flutter build/run).
 const _flutterVersion = String.fromEnvironment('FLUTTER_VERSION', defaultValue: '-');
@@ -121,6 +122,14 @@ class _DiagnosticsScreenState extends ConsumerState<DiagnosticsScreen> {
                 : const Icon(Icons.play_circle_outline),
             label: Text(context.tr('run_self_test')),
             onPressed: _running ? null : _selfTest,
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: OutlinedButton.icon(
+            icon: const Icon(Icons.volume_up_outlined),
+            label: Text(context.tr('sound_test')),
+            onPressed: () => push(context, const SoundTestScreen()),
           ),
         ),
         if (_results != null) ...[
