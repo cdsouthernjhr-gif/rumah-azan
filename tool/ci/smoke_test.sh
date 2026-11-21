@@ -36,7 +36,8 @@ echo "Scenario 1 passed: first launch, $PKG running (pid $PID)"
 # The home-screen widget must be registered with Android's widget host.
 echo "===== Home-screen widget ====="
 adb shell dumpsys appwidget | grep -i "PrayerWidgetProvider" | head -3 || true
-if ! adb shell dumpsys appwidget | grep -q "com.rumahazan.app/.PrayerWidgetProvider"; then
+# dumpsys prints the full class name: com.rumahazan.app/com.rumahazan.app.PrayerWidgetProvider
+if ! adb shell dumpsys appwidget | grep -qE "com\.rumahazan\.app/(com\.rumahazan\.app)?\.PrayerWidgetProvider"; then
   echo "::error::Home-screen widget provider is not registered."; exit 1
 fi
 
