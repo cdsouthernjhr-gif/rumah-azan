@@ -11,6 +11,7 @@ import '../../shared/widgets/common.dart';
 import '../audio_player/audio_library_screen.dart';
 import '../audio_player/player_bar.dart';
 import '../audio_scheduler/scheduler_settings_screen.dart';
+import '../countdown/countdown_screen.dart';
 import '../diagnostics/sound_test_screen.dart';
 import '../islamic_calendar/calendar_screen.dart';
 import '../islamic_calendar/domain/calendar_service.dart';
@@ -53,6 +54,8 @@ class DashboardScreen extends ConsumerWidget {
             ];
             final right = <Widget>[
               const PrayerTimesCard(),
+              const SizedBox(height: 12),
+              const PinnedCountdownsCard(),
               const SizedBox(height: 12),
               const PlayerBar(),
               const SizedBox(height: 12),
@@ -325,6 +328,9 @@ class _QuickAccess extends ConsumerWidget {
       (Icons.library_music_rounded, 'audio', () => open(const AudioLibraryScreen())),
       (Icons.alarm_rounded, 'audio_schedule', () => open(const SchedulerSettingsScreen())),
       (Icons.bedtime_rounded, 'sleep_mode', () => enterSleepMode(ref)),
+      (Icons.hourglass_bottom_rounded, 'countdown_title', () => open(const CountdownScreen())),
+      (Icons.tv_rounded, 'display_mode', () => open(const DisplayModeScreen())),
+      (Icons.settings_outlined, 'settings', () => open(const SettingsScreen())),
     ];
     return GridView.count(
       crossAxisCount: 3,

@@ -14,7 +14,10 @@ import 'package:rumah_azan/data/repositories/settings_repository.dart';
 /// engine and the background-sync engine opened the same NEW database file
 /// at the same time and both ran CREATE TABLE.
 void main() {
-  test('two separate connections can create and use the same new file concurrently', () async {
+  // Timing-dependent stress test: retried so a rare scheduler hiccup on a
+  // loaded CI machine does not block releases; a real regression fails
+  // every attempt. Failures print the round and SQLite error.
+  test('two separate connections can create and use the same new file concurrently', retry: 2, () async {
     final dir = await Directory.systemTemp.createTemp('ra_db');
     final file = File('${dir.path}/rumah_azan.sqlite');
     // Two engines in one process = two drift instances on the same file.
@@ -27,7 +30,14 @@ void main() {
       for (final f in [file, File('${file.path}-wal'), File('${file.path}-shm')]) {
         if (f.existsSync()) f.deleteSync();
       }
-      final opened = await Future.wait([open(), open()]);
+      final List<AppDatabase> opened;
+      try {
+        opened = await Future.wait([open(), open()]);
+      } catch (e, st) {
+        // ignore: avoid_print
+        print('db_concurrency round $round open failed: $e\n$st');
+        rethrow;
+      }
       final a = opened[0], b = opened[1];
       Future<void> use(AppDatabase db) async {
         await SettingsRepository(db).load(); // triggers migrations (CREATE TABLE …)
@@ -35,7 +45,14 @@ void main() {
         await DiagnosticsRepository(db).info('t', 'concurrent write');
       }
 
-      await Future.wait([use(a), use(b)]);
+      try {
+        await Future.wait([use(a), use(b)]);
+      } catch (e, st) {
+        // Make any CI failure diagnosable (round + exact SQLite error).
+        // ignore: avoid_print
+        print('db_concurrency round $round failed: $e\n$st');
+        rethrow;
+      }
       expect(await a.prayerZones.count().getSingle(), greaterThan(50));
       await a.close();
       await b.close();

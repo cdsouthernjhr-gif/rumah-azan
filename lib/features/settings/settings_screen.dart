@@ -18,6 +18,7 @@ import '../../data/static/jakim_zones.dart';
 import '../../shared/widgets/common.dart';
 import '../audio_player/audio_library_screen.dart';
 import '../audio_scheduler/scheduler_settings_screen.dart';
+import '../countdown/countdown_screen.dart';
 import '../diagnostics/diagnostics_screen.dart';
 import '../diagnostics/sound_test_screen.dart';
 import '../location/zone_picker_screen.dart';
@@ -133,6 +134,13 @@ class SettingsScreen extends ConsumerWidget {
           subtitle: Text(context.tr('audio_schedule_sub')),
           trailing: const Icon(Icons.chevron_right),
           onTap: () => push(context, const SchedulerSettingsScreen()),
+        ),
+        ListTile(
+          leading: const Icon(Icons.hourglass_bottom_rounded),
+          title: Text(context.tr('countdown_title')),
+          subtitle: Text(context.tr('countdown_sub')),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () => push(context, const CountdownScreen()),
         ),
         ListTile(
           leading: const Icon(Icons.volume_up_outlined),

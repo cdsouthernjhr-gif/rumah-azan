@@ -4,6 +4,9 @@ import '../../data/models/app_settings.dart';
 import '../../data/models/prayer_day.dart';
 import '../../data/providers/providers.dart';
 import '../../features/audio_scheduler/domain/schedule_planner.dart';
+import '../../data/static/jakim_zones.dart';
+import '../../features/countdown/day_countdown.dart';
+import '../../features/home_widget/widget_payload.dart';
 import '../../features/islamic_calendar/domain/calendar_service.dart';
 import '../constants/app_constants.dart';
 import '../l10n/l10n.dart';
@@ -123,6 +126,7 @@ class AppController {
         nextTitle: events.isEmpty ? null : events.first.title,
         nextAt: events.isEmpty ? null : events.first.triggerAt,
       ));
+      await updateHomeWidget();
       if (days.isEmpty) {
         await diag.warn('scheduler', 'Tiada jadual waktu solat disahkan untuk dijadualkan ($zone)');
       } else {
@@ -133,6 +137,38 @@ class AppController {
       snap.set(SchedulerSnapshot(at: DateTime.now(), error: e.toString()));
       await diag.error('scheduler', '$e');
       return 0;
+    }
+  }
+
+  /// Sends fresh data to the Android home-screen widget (if any is placed).
+  /// Called after every re-plan (app start/resume, settings, daily
+  /// background job) and when countdowns change.
+  Future<void> updateHomeWidget() async {
+    final settings = ref.read(settingsProvider);
+    final zone = settings.zoneCode;
+    if (zone == null) return;
+    try {
+      final calendar = await ref.read(calendarServiceProvider.future);
+      final days = await ref.read(prayerRepoProvider).resolveRange(
+            zone,
+            Myt.todayKey(),
+            31,
+            allowEstimate: settings.allowEstimateDisplay,
+          );
+      final today = Myt.todayKey();
+      final pinned = sortTargets([
+        for (final j in settings.dayCountdownsRaw)
+          if (DayCountdown.fromJson(j) case final c? when c.pinned) resolveCountdown(c, today, calendar),
+      ]);
+      await ref.read(nativeBridgeProvider).updateHomeWidget(buildWidgetPayload(
+            l10n: L10n(settings.language),
+            zone: zoneByCode(zone),
+            days: days,
+            calendar: calendar,
+            pinnedCountdowns: pinned,
+          ));
+    } catch (e) {
+      await ref.read(diagnosticsRepoProvider).warn('widget', '$e');
     }
   }
 

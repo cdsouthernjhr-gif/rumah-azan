@@ -15,6 +15,11 @@ Package: `com.rumahazan.app` · Flutter 3.50 · Android 7.0 (API 24) dan ke atas
 - **Tiada waktu rekaan:** jika tiada data disahkan, amaran jelas dipaparkan.
   Anggaran astronomi hanya dipaparkan dengan label "ANGGARAN", tidak disimpan,
   dan tidak digunakan untuk azan kecuali dibenarkan pengguna.
+- **Kiraan hari** ("lagi berapa hari"): tarikh pilihan (boleh ulang setiap
+  tahun) atau peristiwa Islam (tarikh rasmi/takwim/kiraan dilabel); dipaparkan
+  di dashboard, Mod Paparan dan widget.
+- **Widget skrin utama Android**: waktu seterusnya dengan kiraan detik langsung,
+  enam waktu hari ini, tarikh Masihi & Hijrah, zon dan satu kiraan hari.
 - **Kiraan detik langsung** dengan bar kemajuan, pertukaran tarikh tengah
   malam, dan sumber serta masa kemas kini terakhir.
 - **Enjin audio berjadual** setiap waktu: **A.** bacaan sebelum waktu,

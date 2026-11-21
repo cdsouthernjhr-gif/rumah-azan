@@ -61,6 +61,11 @@ object SharedChannel {
                 result.success(true)
             }
             "drainPlaybackHistory" -> result.success(Scheduler.drainHistory(ctx))
+            "updateHomeWidget" -> {
+                val payload = call.argument<Map<String, Any?>>("payload") ?: emptyMap<String, Any?>()
+                PrayerWidgetProvider.save(ctx, JSONObject(payload))
+                result.success(null)
+            }
             "soundStatus" -> result.success(SoundCheck.status(ctx))
             "playClick" -> {
                 SoundCheck.click(call.argument<Int>("volume") ?: 60)

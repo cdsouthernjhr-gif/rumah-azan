@@ -13,6 +13,7 @@ import 'package:rumah_azan/data/repositories/diagnostics_repository.dart';
 import 'package:rumah_azan/data/repositories/prayer_repository.dart';
 import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:rumah_azan/core/services/native_bridge.dart';
+import 'package:rumah_azan/features/countdown/countdown_screen.dart';
 import 'package:rumah_azan/features/diagnostics/sound_test_screen.dart';
 import 'package:rumah_azan/features/smart_display/display_gallery_screen.dart';
 import 'package:rumah_azan/features/smart_display/display_mode_screen.dart';
@@ -265,6 +266,45 @@ void main() {
     expect(find.text('Uji azan berjadual (15 saat)'), findsOneWidget);
     await teardown(tester, db);
   });
+
+  testWidgets('pinned day countdowns appear on the dashboard (soonest first)', (tester) async {
+    final db = await boot(tester, settings: configured.copyWith({
+      'dayCountdowns': [
+        {'id': 'a', 'title': 'Hari jadi Ibu', 'dateKey': '1960-11-22', 'yearly': true, 'pinned': true},
+        {'id': 'b', 'title': 'Percutian', 'dateKey': '2026-12-22', 'pinned': true},
+        {'id': 'c', 'title': 'Tersembunyi', 'dateKey': '2026-11-30', 'pinned': false},
+      ],
+    }));
+    await tester.scrollUntilVisible(find.text('Kiraan hari'), 300, scrollable: find.byType(Scrollable).first);
+    // Test clock: 12 Nov 2026. Yearly 22 Nov → 10 days; 22 Dec → 40 days.
+    expect(find.text('Hari jadi Ibu'), findsOneWidget);
+    expect(find.text('10 hari lagi'), findsOneWidget);
+    expect(find.text('40 hari lagi'), findsOneWidget);
+    expect(find.text('Tersembunyi'), findsNothing, reason: 'not pinned');
+    expect(tester.getTopLeft(find.text('Hari jadi Ibu')).dy,
+        lessThan(tester.getTopLeft(find.text('Percutian')).dy), reason: 'soonest first');
+    await teardown(tester, db);
+  });
+
+  testWidgets('add an Islamic-event countdown from the countdown screen', (tester) async {
+    final db = await boot(tester, settings: configured);
+    final nav = tester.state<NavigatorState>(find.byType(Navigator).first);
+    nav.push(MaterialPageRoute(builder: (_) => const CountdownScreen()));
+    await settle(tester);
+    expect(find.textContaining('Belum ada kiraan'), findsOneWidget);
+    await tester.tap(find.text('Tambah kiraan'));
+    await settle(tester);
+    await tester.tap(find.text('Peristiwa Islam'));
+    await settle(tester);
+    // Title is suggested from the default event (Awal Ramadan).
+    expect(find.widgetWithText(TextField, 'Awal Ramadan'), findsOneWidget);
+    await tester.tap(find.text('Simpan'));
+    await settle(tester);
+    expect(find.text('Awal Ramadan'), findsWidgets);
+    expect(find.textContaining('hari lagi'), findsOneWidget);
+    expect(find.textContaining('tarikh kiraan'), findsOneWidget);
+    await teardown(tester, db);
+  });
 }
 
 /// Native bridge stand-in that reports a given phone sound state.
@@ -274,4 +314,3 @@ class _FakeSoundBridge extends NativeBridge {
   @override
   Future<Map<String, Object?>> soundStatus() async => status;
 }
-

@@ -106,6 +106,20 @@
             </intent-filter>
         </receiver>
 
+        <!-- Home-screen widget: next prayer + live countdown, six times,
+             Hijri date and the first pinned day countdown. -->
+        <receiver
+            android:name=".PrayerWidgetProvider"
+            android:exported="false"
+            android:label="@string/widget_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/prayer_widget_info" />
+        </receiver>
+
         <!-- Single audio engine for manual and scheduled playback. -->
         <service
             android:name=".audio.PlaybackService"

@@ -107,6 +107,9 @@ class NativeBridge {
       })) ??
       false;
 
+  /// Stores the home-screen widget data and redraws every widget instance.
+  Future<void> updateHomeWidget(Map<String, Object?> payload) => _call('updateHomeWidget', {'payload': payload});
+
   /// Volumes, ringer/DND state, notification channels, permissions.
   Future<Map<String, Object?>> soundStatus() => _map('soundStatus');
 

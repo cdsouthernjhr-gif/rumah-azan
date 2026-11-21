@@ -64,6 +64,7 @@ class AppSettings {
     'wpZoom': 1.0,
     'wpAlignX': 0.0,
     'wpAlignY': 0.0,
+    'dayCountdowns': <Object?>[], // user "days until …" countdowns
     // Housekeeping
     'lastSyncAt': null,
     'onboardingDone': false,
@@ -156,6 +157,12 @@ class AppSettings {
   double get wpZoom => _num('wpZoom').clamp(1.0, 3.0);
   double get wpAlignX => _num('wpAlignX').clamp(-1.0, 1.0);
   double get wpAlignY => _num('wpAlignY').clamp(-1.0, 1.0);
+
+  /// Raw countdown entries (parsed by DayCountdown.fromJson).
+  List<Object?> get dayCountdownsRaw {
+    final v = raw['dayCountdowns'];
+    return v is List ? v : const [];
+  }
 
   DateTime? get lastSyncAt {
     final v = raw['lastSyncAt'];

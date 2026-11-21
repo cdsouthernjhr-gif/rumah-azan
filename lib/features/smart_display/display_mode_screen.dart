@@ -12,6 +12,7 @@ import '../../data/providers/providers.dart';
 import '../../data/static/jakim_zones.dart';
 import '../../shared/widgets/common.dart';
 import '../dashboard/dashboard_screen.dart' show formatGregorian;
+import '../countdown/countdown_screen.dart';
 import '../wallpaper/builtin_wallpapers.dart';
 import '../wallpaper/wallpaper_view.dart';
 import 'display_gallery.dart';
@@ -161,13 +162,15 @@ class _DisplayLayout extends ConsumerWidget {
     final zone = zoneByCode(s.zoneCode);
     final hijri = cal?.hijriFor(today);
     final events = cal?.eventsBetween(today, 30) ?? const [];
+    final countdowns = ref.watch(pinnedCountdownsProvider).where((t) => t.days != null && t.days! >= 0).take(3).toList();
     final w = Myt.toWall(now);
     const white = Colors.white;
     final accent = Theme.of(context).colorScheme.secondary;
 
     return LayoutBuilder(builder: (context, c) {
       final scale = (c.maxWidth / 1280).clamp(0.6, 2.2);
-      final showSide = c.maxWidth > c.maxHeight * 1.3 && (events.isNotEmpty || (player != null && !player.isIdle));
+      final showSide = c.maxWidth > c.maxHeight * 1.3 &&
+          (events.isNotEmpty || countdowns.isNotEmpty || (player != null && !player.isIdle));
       TextStyle t(double size, [FontWeight wgt = FontWeight.w400]) => TextStyle(
             color: white,
             fontSize: size * scale,
@@ -271,6 +274,16 @@ class _DisplayLayout extends ConsumerWidget {
             if (player != null && !player.isIdle) ...[
               Text(context.tr('now_playing'), style: t(16, FontWeight.w600).copyWith(color: accent)),
               Text(player.title ?? '-', style: t(18)),
+              SizedBox(height: 16 * scale),
+            ],
+            if (countdowns.isNotEmpty) ...[
+              Text(context.tr('countdown_title'), style: t(16, FontWeight.w600).copyWith(color: accent)),
+              for (final cd in countdowns)
+                Padding(
+                  padding: EdgeInsets.only(top: 8 * scale),
+                  child: Text('${cd.countdown.title}\n${countdownLabel(context, cd.days)}${cd.isCalculated ? ' *' : ''}',
+                      style: t(16)),
+                ),
               SizedBox(height: 16 * scale),
             ],
             if (events.isNotEmpty) Text(context.tr('announcements'), style: t(16, FontWeight.w600).copyWith(color: accent)),

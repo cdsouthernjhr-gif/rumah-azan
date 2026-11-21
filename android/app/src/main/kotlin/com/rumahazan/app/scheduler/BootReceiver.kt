@@ -19,6 +19,9 @@ class BootReceiver : BroadcastReceiver() {
             Intent.ACTION_TIMEZONE_CHANGED,
             "android.app.action.SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED" -> {
                 Scheduler.scheduleNext(ctx)
+                // Widget alarms are cleared on reboot; clock changes shift
+                // the next redraw — redraw now.
+                com.rumahazan.app.PrayerWidgetProvider.refreshAll(ctx)
             }
         }
     }

@@ -33,6 +33,13 @@ if grep -q "startup error" smoke/logcat.txt; then
 fi
 echo "Scenario 1 passed: first launch, $PKG running (pid $PID)"
 
+# The home-screen widget must be registered with Android's widget host.
+echo "===== Home-screen widget ====="
+adb shell dumpsys appwidget | grep -i "PrayerWidgetProvider" | head -3 || true
+if ! adb shell dumpsys appwidget | grep -q "com.rumahazan.app/.PrayerWidgetProvider"; then
+  echo "::error::Home-screen widget provider is not registered."; exit 1
+fi
+
 # Exact alarms must be available out of the box (Android 14 denies
 # SCHEDULE_EXACT_ALARM by default; without exact alarms the azan audio
 # cannot start from the background).
